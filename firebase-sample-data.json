@@ -1,0 +1,81 @@
+{
+  "doors": {
+    "door_main": {
+      "name": "Cửa chính",
+      "location": "Tầng 1",
+      "status": {
+        "isOpen": false,
+        "isOnline": true,
+        "lastUpdated": 1702060800000
+      },
+      "command": {
+        "action": "none",
+        "timestamp": 0,
+        "requestedBy": null,
+        "processed": true
+      },
+      "config": {
+        "autoLockDelay": 5000
+      }
+    }
+  },
+  "users": {
+    "user_001": {
+      "name": "Nguyễn Văn A",
+      "email": "nguyenvana@email.com",
+      "role": "admin",
+      "isActive": true,
+      "cardUid": "A1B2C3D4",
+      "createdAt": 1702000000000
+    },
+    "user_002": {
+      "name": "Trần Thị B",
+      "email": "tranthib@email.com",
+      "role": "user",
+      "isActive": true,
+      "cardUid": "E5F6G7H8",
+      "createdAt": 1702000000000
+    }
+  },
+  "cardIndex": {
+    "A1B2C3D4": "user_001",
+    "E5F6G7H8": "user_002"
+  },
+  "accessLogs": {
+    "log_001": {
+      "timestamp": 1702060800000,
+      "userId": "user_001",
+      "userName": "Nguyễn Văn A",
+      "cardUid": "A1B2C3D4",
+      "doorId": "door_main",
+      "doorName": "Cửa chính",
+      "action": "entry",
+      "result": "granted"
+    },
+    "log_002": {
+      "timestamp": 1702061000000,
+      "userId": "user_002",
+      "userName": "Trần Thị B",
+      "cardUid": "E5F6G7H8",
+      "doorId": "door_main",
+      "doorName": "Cửa chính",
+      "action": "entry",
+      "result": "granted"
+    },
+    "log_003": {
+      "timestamp": 1702062000000,
+      "userId": null,
+      "userName": null,
+      "cardUid": "UNKNOWN123",
+      "doorId": "door_main",
+      "doorName": "Cửa chính",
+      "action": "entry",
+      "result": "denied",
+      "reason": "Thẻ chưa đăng ký"
+    }
+  },
+  "systemConfig": {
+    "autoLockDelay": 5000,
+    "defaultDoorId": "door_main"
+  }
+}
