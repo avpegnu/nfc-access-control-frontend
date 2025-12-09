@@ -1,94 +1,132 @@
-import { useState, useEffect } from 'react';
-import { db, usersRef, onValue, set, push, remove, ref, update } from '../services/firebase';
+import { useState, useEffect, useCallback } from 'react';
+import api from '../services/api';
 
 export function useUsers() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const unsubscribe = onValue(
-      usersRef(),
-      (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-          const userList = Object.entries(data).map(([id, user]) => ({
-            id,
-            ...user,
-          }));
-          setUsers(userList);
-        } else {
-          setUsers([]);
-        }
-        setLoading(false);
-      },
-      (err) => {
-        setError(err.message);
-        setLoading(false);
-      }
-    );
+  // Fetch all users
+  const fetchUsers = useCallback(async () => {
+    try {
+      setError(null);
+      setLoading(true);
 
-    return () => unsubscribe();
+      const response = await api.getUsers({ limit: 1000 }); // Get all users
+
+      if (response.success) {
+        setUsers(response.data.items || []);
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  const addUser = async (userData) => {
-    try {
-      // 1. Add user to users collection
-      const newUserRef = push(usersRef());
-      await set(newUserRef, {
-        ...userData,
-        isActive: true,
-        role: userData.role || 'user',
-        createdAt: Date.now(),
-      });
+  // Initial fetch and SSE subscription
+  useEffect(() => {
+    fetchUsers();
 
-      // 2. Add to cardIndex for quick lookup
-      await set(ref(db, `cardIndex/${userData.cardUid}`), newUserRef.key);
-
-      return newUserRef.key;
-    } catch (err) {
-      setError(err.message);
-      throw err;
-    }
-  };
-
-  const updateUser = async (userId, userData) => {
-    try {
-      await update(ref(db, `users/${userId}`), {
-        ...userData,
-        updatedAt: Date.now(),
-      });
-      return true;
-    } catch (err) {
-      setError(err.message);
-      throw err;
-    }
-  };
-
-  const deleteUser = async (userId, cardUid) => {
-    try {
-      // 1. Remove from users
-      await remove(ref(db, `users/${userId}`));
-      // 2. Remove from cardIndex
-      if (cardUid) {
-        await remove(ref(db, `cardIndex/${cardUid}`));
+    // Subscribe to SSE for user updates
+    const handleSSEEvent = (event) => {
+      if (event.type === 'user_update') {
+        // Refetch users when there's an update
+        fetchUsers();
       }
-      return true;
-    } catch (err) {
-      setError(err.message);
-      throw err;
-    }
-  };
+    };
 
-  const toggleUserActive = async (userId, currentStatus) => {
+    api.connectSSE(handleSSEEvent, () => {});
+
+    return () => {
+      // Don't disconnect SSE here
+    };
+  }, [fetchUsers]);
+
+  // Add new user
+  const addUser = useCallback(async (userData) => {
     try {
-      await set(ref(db, `users/${userId}/isActive`), !currentStatus);
+      setError(null);
+      const response = await api.createUser(userData);
+
+      if (response.success) {
+        // Add to local state immediately
+        setUsers(prev => [...prev, response.data]);
+        return response.data.id;
+      }
+
+      throw new Error('Failed to create user');
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
+  }, []);
+
+  // Update user
+  const updateUser = useCallback(async (userId, userData) => {
+    try {
+      setError(null);
+      const response = await api.updateUser(userId, userData);
+
+      if (response.success) {
+        // Update local state
+        setUsers(prev => prev.map(u =>
+          u.id === userId ? response.data : u
+        ));
+        return true;
+      }
+
+      throw new Error('Failed to update user');
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
+  }, []);
+
+  // Delete user
+  const deleteUser = useCallback(async (userId) => {
+    try {
+      setError(null);
+      await api.deleteUser(userId);
+
+      // Remove from local state
+      setUsers(prev => prev.filter(u => u.id !== userId));
       return true;
     } catch (err) {
       setError(err.message);
       throw err;
     }
-  };
+  }, []);
 
-  return { users, loading, error, addUser, updateUser, deleteUser, toggleUserActive };
+  // Toggle user active status
+  const toggleUserActive = useCallback(async (userId) => {
+    try {
+      setError(null);
+      const response = await api.toggleUserActive(userId);
+
+      if (response.success) {
+        // Update local state
+        setUsers(prev => prev.map(u =>
+          u.id === userId ? { ...u, isActive: response.data.isActive } : u
+        ));
+        return true;
+      }
+
+      throw new Error('Failed to toggle user status');
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
+  }, []);
+
+  return {
+    users,
+    loading,
+    error,
+    addUser,
+    updateUser,
+    deleteUser,
+    toggleUserActive,
+    refetch: fetchUsers
+  };
 }

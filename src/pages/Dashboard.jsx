@@ -3,7 +3,7 @@ import DoorStatus from "../components/door/DoorStatus";
 import DoorControl from "../components/door/DoorControl";
 import AccessHistoryTable from "../components/history/AccessHistoryTable";
 import { useDoorStatus } from "../hooks/useDoorStatus";
-import { useAccessLogs } from "../hooks/useAccessLogs";
+import { useAccessLogs, useAccessStats } from "../hooks/useAccessLogs";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import BlockIcon from "@mui/icons-material/Block";
 import DevicesIcon from "@mui/icons-material/Devices";
@@ -62,9 +62,11 @@ export default function Dashboard() {
     lockDoor,
   } = useDoorStatus();
   const { logs, loading: logsLoading } = useAccessLogs(10);
+  const { stats, loading: statsLoading } = useAccessStats('today');
 
-  const grantedCount = logs.filter((l) => l.result === "granted").length;
-  const deniedCount = logs.filter((l) => l.result === "denied").length;
+  const grantedCount = stats?.granted || 0;
+  const deniedCount = stats?.denied || 0;
+  const totalActivity = stats?.totalAccess || logs.length;
 
   return (
     <Box
@@ -174,7 +176,7 @@ export default function Dashboard() {
             />
             <StatCard
               icon={<HistoryIcon sx={{ color: "#fbbf24", fontSize: { xs: 16, sm: 20 } }} />}
-              value={logs.length}
+              value={totalActivity}
               label="Hoạt động"
               color="#fbbf24"
             />

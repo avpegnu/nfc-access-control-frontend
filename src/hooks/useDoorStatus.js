@@ -1,55 +1,93 @@
-import { useState, useEffect } from 'react';
-import { doorStatusRef, doorCommandRef, onValue, set } from '../services/firebase';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import api from '../services/api';
 
 export function useDoorStatus(doorId = 'door_main') {
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [commandLoading, setCommandLoading] = useState(false);
+  const sseConnectedRef = useRef(false);
 
-  useEffect(() => {
-    const unsubscribe = onValue(
-      doorStatusRef(doorId),
-      (snapshot) => {
-        setStatus(snapshot.val());
-        setLoading(false);
-      },
-      (err) => {
-        setError(err.message);
-        setLoading(false);
+  // Fetch initial status
+  const fetchStatus = useCallback(async () => {
+    try {
+      setError(null);
+      const response = await api.getDoorStatus(doorId);
+
+      if (response.success) {
+        setStatus(response.data.status);
       }
-    );
-
-    return () => unsubscribe();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   }, [doorId]);
 
-  const sendCommand = async (action) => {
+  // Initial fetch and SSE subscription
+  useEffect(() => {
+    fetchStatus();
+
+    // Subscribe to SSE for realtime updates
+    const handleSSEEvent = (event) => {
+      if (event.type === 'door_status' && event.data.doorId === doorId) {
+        setStatus(event.data.status);
+      }
+    };
+
+    const handleSSEError = () => {
+      // On SSE error, fall back to polling
+      if (!sseConnectedRef.current) {
+        const pollInterval = setInterval(fetchStatus, 5000);
+        return () => clearInterval(pollInterval);
+      }
+    };
+
+    // Connect SSE
+    api.connectSSE(handleSSEEvent, handleSSEError);
+    sseConnectedRef.current = true;
+
+    return () => {
+      // Don't disconnect SSE here as it's shared across hooks
+      sseConnectedRef.current = false;
+    };
+  }, [doorId, fetchStatus]);
+
+  // Send command to door
+  const sendCommand = useCallback(async (action) => {
     try {
-      // Gửi command lên Firebase
-      await set(doorCommandRef(doorId), {
-        action: action,
-        timestamp: Date.now(),
-        requestedBy: 'web_admin',
-        processed: false,
-      });
+      setError(null);
+      setCommandLoading(true);
 
-      // GIẢ LẬP: Vì chưa có ESP32, tự cập nhật status luôn
-      // Khi có ESP32 thật, có thể xóa đoạn này
-      const newIsOpen = action === 'unlock';
-      await set(doorStatusRef(doorId), {
-        isOpen: newIsOpen,
-        isOnline: true,
-        lastUpdated: Date.now(),
-      });
+      const response = await api.sendDoorCommand(doorId, action);
 
-      return true;
+      if (response.success) {
+        // Optimistic update while waiting for SSE
+        setStatus(prev => ({
+          ...prev,
+          isOpen: action === 'unlock'
+        }));
+      }
+
+      return response.success;
     } catch (err) {
       setError(err.message);
       return false;
+    } finally {
+      setCommandLoading(false);
     }
+  }, [doorId]);
+
+  const unlockDoor = useCallback(() => sendCommand('unlock'), [sendCommand]);
+  const lockDoor = useCallback(() => sendCommand('lock'), [sendCommand]);
+
+  return {
+    status,
+    loading,
+    error,
+    commandLoading,
+    unlockDoor,
+    lockDoor,
+    refetch: fetchStatus
   };
-
-  const unlockDoor = () => sendCommand('unlock');
-  const lockDoor = () => sendCommand('lock');
-
-  return { status, loading, error, unlockDoor, lockDoor };
 }

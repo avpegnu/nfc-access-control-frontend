@@ -1,6 +1,5 @@
 import { Box, Typography, TextField, Button, Grid, Alert, Skeleton } from '@mui/material';
 import { useState, useEffect } from 'react';
-import { systemConfigRef, onValue, set } from '../services/firebase';
 import SettingsIcon from '@mui/icons-material/Settings';
 import TimerIcon from '@mui/icons-material/Timer';
 import InfoIcon from '@mui/icons-material/Info';
@@ -17,15 +16,16 @@ export default function Settings() {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    const unsubscribe = onValue(systemConfigRef(), (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        setConfig(data);
+    // Load config from localStorage (temporary solution)
+    const savedConfig = localStorage.getItem('systemConfig');
+    if (savedConfig) {
+      try {
+        setConfig(JSON.parse(savedConfig));
+      } catch (e) {
+        console.error('Failed to parse config:', e);
       }
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
+    }
+    setLoading(false);
   }, []);
 
   const handleChange = (e) => {
@@ -40,7 +40,8 @@ export default function Settings() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await set(systemConfigRef(), config);
+      // Save to localStorage (temporary solution)
+      localStorage.setItem('systemConfig', JSON.stringify(config));
       setSuccess('Lưu cấu hình thành công!');
     } catch (err) {
       alert('Lỗi: ' + err.message);
@@ -224,7 +225,7 @@ export default function Settings() {
           </Box>
         </Grid>
 
-        {/* Firebase Guide */}
+        {/* System Info */}
         <Grid item xs={12} md={6}>
           <Box
             sx={{
@@ -247,67 +248,46 @@ export default function Settings() {
               </Box>
               <Box>
                 <Typography variant="h6" sx={{ color: '#f1f5f9', fontWeight: 600 }}>
-                  Hướng dẫn Firebase
+                  Thông tin hệ thống
                 </Typography>
                 <Typography variant="caption" sx={{ color: '#94a3b8' }}>
-                  Các bước thiết lập cơ sở dữ liệu
+                  Kiến trúc và kết nối
                 </Typography>
               </Box>
             </Box>
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {[
-                { step: 1, text: 'Truy cập', highlight: 'Firebase Console' },
-                { step: 2, text: 'Chọn', highlight: 'Build > Realtime Database' },
-                { step: 3, text: 'Copy cấu hình vào file', highlight: '.env' },
-                { step: 4, text: 'Import dữ liệu mẫu vào database', highlight: '' },
+                { label: 'Kiến trúc', value: 'Frontend → Backend API → Firebase' },
+                { label: 'Backend API', value: import.meta.env.VITE_API_URL || 'http://localhost:3001/api' },
+                { label: 'Realtime', value: 'Server-Sent Events (SSE)' },
+                { label: 'Authentication', value: 'JWT Token' },
               ].map((item) => (
                 <Box
-                  key={item.step}
+                  key={item.label}
                   sx={{
                     display: 'flex',
+                    justifyContent: 'space-between',
                     alignItems: 'center',
-                    gap: 2,
                     p: 2,
                     borderRadius: 2,
                     background: 'rgba(255, 255, 255, 0.03)',
                     border: '1px solid rgba(255, 255, 255, 0.05)',
                   }}
                 >
-                  <Box
+                  <Typography variant="body2" sx={{ color: '#94a3b8' }}>
+                    {item.label}
+                  </Typography>
+                  <Typography
+                    variant="body2"
                     sx={{
-                      width: 28,
-                      height: 28,
-                      borderRadius: '50%',
-                      background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '0.875rem',
-                      fontWeight: 600,
-                      color: '#fff',
-                      flexShrink: 0,
+                      color: '#818cf8',
+                      fontWeight: 500,
+                      fontFamily: 'monospace',
+                      fontSize: '0.8rem',
                     }}
                   >
-                    {item.step}
-                  </Box>
-                  <Typography variant="body2" sx={{ color: '#94a3b8' }}>
-                    {item.text}{' '}
-                    {item.highlight && (
-                      <Box
-                        component="span"
-                        sx={{
-                          color: '#818cf8',
-                          fontWeight: 600,
-                          background: 'rgba(99, 102, 241, 0.15)',
-                          px: 1,
-                          py: 0.25,
-                          borderRadius: 1,
-                        }}
-                      >
-                        {item.highlight}
-                      </Box>
-                    )}
+                    {item.value}
                   </Typography>
                 </Box>
               ))}
@@ -325,20 +305,7 @@ export default function Settings() {
                 },
               }}
             >
-              Xem file{' '}
-              <Box
-                component="code"
-                sx={{
-                  background: 'rgba(99, 102, 241, 0.2)',
-                  px: 1,
-                  py: 0.25,
-                  borderRadius: 1,
-                  fontFamily: 'monospace',
-                }}
-              >
-                firebase-sample-data.json
-              </Box>{' '}
-              để import dữ liệu mẫu
+              Cấu hình được lưu tạm vào localStorage. Trong môi trường production, sẽ lưu vào database.
             </Alert>
           </Box>
         </Grid>

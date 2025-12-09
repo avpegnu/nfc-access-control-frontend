@@ -37,17 +37,8 @@ export default function Login() {
       navigate('/');
     } catch (err) {
       console.error(err);
-      if (err.code === 'auth/user-not-found') {
-        setError('Tài khoản không tồn tại');
-      } else if (err.code === 'auth/wrong-password') {
-        setError('Mật khẩu không đúng');
-      } else if (err.code === 'auth/invalid-email') {
-        setError('Email không hợp lệ');
-      } else if (err.code === 'auth/invalid-credential') {
-        setError('Email hoặc mật khẩu không đúng');
-      } else {
-        setError('Đăng nhập thất bại. Vui lòng thử lại.');
-      }
+      // Error message comes from API
+      setError(err.message || 'Đăng nhập thất bại. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
