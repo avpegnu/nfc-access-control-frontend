@@ -135,6 +135,61 @@ class ApiService {
     });
   }
 
+  // ============ Card APIs (API v1) ============
+
+  async getCards(params = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    return this.request(`/v1/cards${queryString ? `?${queryString}` : ''}`);
+  }
+
+  async getCardById(cardId) {
+    return this.request(`/v1/cards/${cardId}`);
+  }
+
+  async updateCard(cardId, cardData) {
+    return this.request(`/v1/cards/${cardId}`, {
+      method: 'PUT',
+      body: cardData,
+    });
+  }
+
+  async assignUserToCard(cardId, userId, policy = {}) {
+    return this.request(`/v1/cards/${cardId}/assign`, {
+      method: 'POST',
+      body: { user_id: userId, policy },
+    });
+  }
+
+  async revokeCard(cardId, reason = '') {
+    return this.request(`/v1/cards/${cardId}/revoke`, {
+      method: 'POST',
+      body: { reason },
+    });
+  }
+
+  async deleteCard(cardId) {
+    return this.request(`/v1/cards/${cardId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // ============ Device APIs (API v1) ============
+
+  async getDevices() {
+    return this.request('/v1/device/list');
+  }
+
+  async getDeviceById(deviceId) {
+    return this.request(`/v1/device/${deviceId}`);
+  }
+
+  async updateDeviceConfig(deviceId, config) {
+    return this.request(`/v1/device/${deviceId}/config`, {
+      method: 'PUT',
+      body: config,
+    });
+  }
+
   // ============ Door APIs ============
 
   async getDoors() {

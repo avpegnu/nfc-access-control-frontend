@@ -15,15 +15,14 @@ import {
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PersonIcon from '@mui/icons-material/Person';
 import EmailIcon from '@mui/icons-material/Email';
-import CreditCardIcon from '@mui/icons-material/CreditCard';
 import BadgeIcon from '@mui/icons-material/Badge';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import InfoIcon from '@mui/icons-material/Info';
 
 export default function AddUserForm({ onAdd }) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    cardUid: '',
     role: 'user',
   });
   const [loading, setLoading] = useState(false);
@@ -47,10 +46,6 @@ export default function AddUserForm({ onAdd }) {
       setError('Vui lòng nhập họ tên');
       return;
     }
-    if (!formData.cardUid.trim()) {
-      setError('Vui lòng nhập UID thẻ');
-      return;
-    }
 
     setLoading(true);
     setError('');
@@ -59,7 +54,6 @@ export default function AddUserForm({ onAdd }) {
       await onAdd({
         name: formData.name.trim(),
         email: formData.email.trim(),
-        cardUid: formData.cardUid.trim().toUpperCase(),
         role: formData.role,
       });
 
@@ -67,7 +61,6 @@ export default function AddUserForm({ onAdd }) {
       setFormData({
         name: '',
         email: '',
-        cardUid: '',
         role: 'user',
       });
     } catch (err) {
@@ -123,10 +116,29 @@ export default function AddUserForm({ onAdd }) {
             Thêm người dùng mới
           </Typography>
           <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: { xs: '0.65rem', sm: '0.75rem' } }}>
-            Đăng ký thẻ NFC cho người dùng
+            Tạo người dùng để gán vào thẻ NFC
           </Typography>
         </Box>
       </Box>
+
+      {/* Info Box */}
+      <Alert
+        severity="info"
+        icon={<InfoIcon />}
+        sx={{
+          mb: 2,
+          background: 'rgba(99, 102, 241, 0.1)',
+          border: '1px solid rgba(99, 102, 241, 0.3)',
+          color: '#818cf8',
+          '& .MuiAlert-icon': {
+            color: '#818cf8',
+          },
+        }}
+      >
+        <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
+          Sau khi tạo user, vào <strong>Quản lý thẻ</strong> để gán thẻ NFC cho người này
+        </Typography>
+      </Alert>
 
       {error && (
         <Alert
@@ -183,7 +195,7 @@ export default function AddUserForm({ onAdd }) {
 
         <TextField
           fullWidth
-          label="Email"
+          label="Email (không bắt buộc)"
           name="email"
           type="email"
           value={formData.email}
@@ -193,31 +205,6 @@ export default function AddUserForm({ onAdd }) {
             startAdornment: (
               <InputAdornment position="start">
                 <EmailIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-
-        <TextField
-          fullWidth
-          label="UID Thẻ NFC"
-          name="cardUid"
-          value={formData.cardUid}
-          onChange={handleChange}
-          required
-          placeholder="VD: A1B2C3D4"
-          helperText="Nhập UID thẻ NFC (đọc từ ESP32)"
-          sx={{
-            ...inputSx,
-            mb: 2,
-            '& .MuiFormHelperText-root': {
-              color: '#64748b',
-            },
-          }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <CreditCardIcon />
               </InputAdornment>
             ),
           }}

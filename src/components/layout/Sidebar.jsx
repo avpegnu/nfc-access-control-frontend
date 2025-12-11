@@ -15,6 +15,8 @@ import {
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import HistoryIcon from '@mui/icons-material/History';
 import PeopleIcon from '@mui/icons-material/People';
+import CreditCardIcon from '@mui/icons-material/CreditCard';
+import RouterIcon from '@mui/icons-material/Router';
 import SettingsIcon from '@mui/icons-material/Settings';
 import DoorSlidingIcon from '@mui/icons-material/DoorSliding';
 
@@ -24,6 +26,8 @@ const menuItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
   { text: 'Lịch sử truy cập', icon: <HistoryIcon />, path: '/history' },
   { text: 'Người dùng', icon: <PeopleIcon />, path: '/users' },
+  { text: 'Quản lý thẻ', icon: <CreditCardIcon />, path: '/cards' },
+  { text: 'Thiết bị', icon: <RouterIcon />, path: '/devices' },
   { text: 'Cài đặt', icon: <SettingsIcon />, path: '/settings' },
 ];
 

@@ -8,6 +8,8 @@ import Layout from './components/layout/Layout';
 import Dashboard from './pages/Dashboard';
 import History from './pages/History';
 import Users from './pages/Users';
+import Cards from './pages/Cards';
+import Devices from './pages/Devices';
 import Settings from './pages/Settings';
 import Login from './pages/Login';
 
@@ -129,6 +131,8 @@ function App() {
               <Route index element={<Dashboard />} />
               <Route path="history" element={<History />} />
               <Route path="users" element={<Users />} />
+              <Route path="cards" element={<Cards />} />
+              <Route path="devices" element={<Devices />} />
               <Route path="settings" element={<Settings />} />
             </Route>
           </Routes>
