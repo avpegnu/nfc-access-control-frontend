@@ -1,8 +1,9 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
 import { AuthProvider } from './contexts/AuthContext';
+import { ThemeContextProvider, useThemeMode } from './contexts/ThemeContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Layout from './components/layout/Layout';
 import Dashboard from './pages/Dashboard';
@@ -12,11 +13,13 @@ import Cards from './pages/Cards';
 import Devices from './pages/Devices';
 import Settings from './pages/Settings';
 import Login from './pages/Login';
+import { useMemo } from 'react';
+import { createTheme } from '@mui/material/styles';
 
-// Modern dark theme with gradients
-const theme = createTheme({
+// Create theme based on mode
+const createAppTheme = (mode) => createTheme({
   palette: {
-    mode: 'dark',
+    mode,
     primary: {
       main: '#6366f1',
       light: '#818cf8',
@@ -43,12 +46,12 @@ const theme = createTheme({
       dark: '#d97706',
     },
     background: {
-      default: '#0f172a',
-      paper: '#1e293b',
+      default: mode === 'dark' ? '#0f172a' : '#f8fafc',
+      paper: mode === 'dark' ? '#1e293b' : '#ffffff',
     },
     text: {
-      primary: '#f1f5f9',
-      secondary: '#94a3b8',
+      primary: mode === 'dark' ? '#f1f5f9' : '#1e293b',
+      secondary: mode === 'dark' ? '#94a3b8' : '#64748b',
     },
   },
   typography: {
@@ -112,7 +115,10 @@ const theme = createTheme({
   },
 });
 
-function App() {
+function ThemedApp() {
+  const { mode } = useThemeMode();
+  const theme = useMemo(() => createAppTheme(mode), [mode]);
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -139,6 +145,14 @@ function App() {
         </AuthProvider>
       </BrowserRouter>
     </ThemeProvider>
+  );
+}
+
+function App() {
+  return (
+    <ThemeContextProvider>
+      <ThemedApp />
+    </ThemeContextProvider>
   );
 }
 

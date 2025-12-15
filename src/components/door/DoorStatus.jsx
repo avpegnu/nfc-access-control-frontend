@@ -3,22 +3,25 @@ import LockOpenIcon from '@mui/icons-material/LockOpen';
 import LockIcon from '@mui/icons-material/Lock';
 import WifiIcon from '@mui/icons-material/Wifi';
 import WifiOffIcon from '@mui/icons-material/WifiOff';
+import { useThemeMode } from '../../contexts/ThemeContext';
 
 export default function DoorStatus({ status, loading }) {
+  const { colors, isDark } = useThemeMode();
+
   if (loading) {
     return (
       <Box
         sx={{
           p: 3,
           borderRadius: 2,
-          background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9))',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          background: colors.bgCard,
+          border: `1px solid ${colors.border}`,
           textAlign: 'center',
           flex: 1,
         }}
       >
-        <Skeleton variant="circular" width={64} height={64} sx={{ mx: 'auto', mb: 2, bgcolor: 'rgba(255,255,255,0.1)' }} />
-        <Skeleton variant="text" width="60%" sx={{ mx: 'auto', bgcolor: 'rgba(255,255,255,0.1)' }} />
+        <Skeleton variant="circular" width={64} height={64} sx={{ mx: 'auto', mb: 2, bgcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }} />
+        <Skeleton variant="text" width="60%" sx={{ mx: 'auto', bgcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }} />
       </Box>
     );
   }

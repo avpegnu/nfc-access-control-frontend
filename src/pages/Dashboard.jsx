@@ -8,16 +8,16 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import BlockIcon from "@mui/icons-material/Block";
 import DevicesIcon from "@mui/icons-material/Devices";
 import HistoryIcon from "@mui/icons-material/History";
+import { useThemeMode } from "../contexts/ThemeContext";
 
-function StatCard({ icon, value, label, color }) {
+function StatCard({ icon, value, label, color, colors }) {
   return (
     <Box
       sx={{
         p: { xs: 1, sm: 1.5 },
         borderRadius: 2,
-        background:
-          "linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9))",
-        border: "1px solid rgba(255, 255, 255, 0.1)",
+        background: colors.bgCard,
+        border: `1px solid ${colors.border}`,
         display: "flex",
         alignItems: "center",
         gap: { xs: 1, sm: 1.5 },
@@ -45,7 +45,7 @@ function StatCard({ icon, value, label, color }) {
         >
           {value}
         </Typography>
-        <Typography sx={{ color: "#94a3b8", fontSize: { xs: "0.6rem", sm: "0.7rem" } }}>
+        <Typography sx={{ color: colors.textSecondary, fontSize: { xs: "0.6rem", sm: "0.7rem" } }}>
           {label}
         </Typography>
       </Box>
@@ -63,6 +63,7 @@ export default function Dashboard() {
   } = useDoorStatus();
   const { logs, loading: logsLoading } = useAccessLogs(10);
   const { stats, loading: statsLoading } = useAccessStats('today');
+  const { colors } = useThemeMode();
 
   const grantedCount = stats?.granted || 0;
   const deniedCount = stats?.denied || 0;
@@ -77,7 +78,7 @@ export default function Dashboard() {
         variant="h6"
         sx={{
           fontWeight: 700,
-          color: "#f1f5f9",
+          color: colors.textPrimary,
           mb: 2,
           fontSize: { xs: "1.5rem", sm: "2rem" },
         }}
@@ -161,24 +162,28 @@ export default function Dashboard() {
               value={grantedCount}
               label="Thành công"
               color="#34d399"
+              colors={colors}
             />
             <StatCard
               icon={<BlockIcon sx={{ color: "#f87171", fontSize: { xs: 16, sm: 20 } }} />}
               value={deniedCount}
               label="Từ chối"
               color="#f87171"
+              colors={colors}
             />
             <StatCard
               icon={<DevicesIcon sx={{ color: "#818cf8", fontSize: { xs: 16, sm: 20 } }} />}
               value={status?.isOnline ? "1" : "0"}
               label="Thiết bị"
               color="#818cf8"
+              colors={colors}
             />
             <StatCard
               icon={<HistoryIcon sx={{ color: "#fbbf24", fontSize: { xs: 16, sm: 20 } }} />}
               value={totalActivity}
               label="Hoạt động"
               color="#fbbf24"
+              colors={colors}
             />
           </Box>
 
@@ -187,9 +192,8 @@ export default function Dashboard() {
             sx={{
               p: 2,
               borderRadius: 2,
-              background:
-                "linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9))",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
+              background: colors.bgCard,
+              border: `1px solid ${colors.border}`,
               flex: 1,
               display: "flex",
               flexDirection: "column",
@@ -200,7 +204,7 @@ export default function Dashboard() {
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
               <HistoryIcon sx={{ color: "#818cf8", fontSize: 20 }} />
               <Typography
-                sx={{ color: "#f1f5f9", fontWeight: 600, fontSize: "0.9rem" }}
+                sx={{ color: colors.textPrimary, fontWeight: 600, fontSize: "0.9rem" }}
               >
                 Hoạt động gần đây
               </Typography>

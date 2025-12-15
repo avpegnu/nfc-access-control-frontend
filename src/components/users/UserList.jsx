@@ -24,17 +24,18 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import dayjs from 'dayjs';
 import { useState } from 'react';
+import { useThemeMode } from '../../contexts/ThemeContext';
 
 // Mobile Card Component
-function MobileUserCard({ user, onDelete, onToggleActive }) {
+function MobileUserCard({ user, onDelete, onToggleActive, colors }) {
   return (
     <Box
       sx={{
         p: 2,
         mb: 1.5,
         borderRadius: 2,
-        background: 'rgba(255, 255, 255, 0.03)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
+        background: colors.bgHover,
+        border: `1px solid ${colors.borderLight}`,
         transition: 'all 0.2s ease',
       }}
     >
@@ -57,10 +58,10 @@ function MobileUserCard({ user, onDelete, onToggleActive }) {
           )}
         </Avatar>
         <Box>
-          <Typography variant="body2" sx={{ color: '#f1f5f9', fontWeight: 500, fontSize: '0.875rem' }}>
+          <Typography variant="body2" sx={{ color: colors.textPrimary, fontWeight: 500, fontSize: '0.875rem' }}>
             {user.name}
           </Typography>
-          <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.7rem' }}>
+          <Typography variant="caption" sx={{ color: colors.textSecondary, fontSize: '0.7rem' }}>
             {user.email || 'Chưa có email'}
           </Typography>
         </Box>
@@ -93,7 +94,7 @@ function MobileUserCard({ user, onDelete, onToggleActive }) {
             </Typography>
           </Box>
         ) : (
-          <Typography variant="caption" sx={{ color: '#64748b', fontStyle: 'italic', fontSize: '0.7rem' }}>
+          <Typography variant="caption" sx={{ color: colors.textSecondary, fontStyle: 'italic', fontSize: '0.7rem' }}>
             Chưa có thẻ
           </Typography>
         )}
@@ -120,8 +121,8 @@ function MobileUserCard({ user, onDelete, onToggleActive }) {
 
         {/* Date */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <CalendarTodayIcon sx={{ fontSize: 12, color: '#64748b' }} />
-          <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.7rem' }}>
+          <CalendarTodayIcon sx={{ fontSize: 12, color: colors.textSecondary }} />
+          <Typography variant="caption" sx={{ color: colors.textSecondary, fontSize: '0.7rem' }}>
             {user.createdAt ? dayjs(user.createdAt).format('DD/MM/YY') : '-'}
           </Typography>
         </Box>
@@ -165,6 +166,7 @@ export default function UserList({ users, loading, onDelete, onToggleActive }) {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { colors, isDark } = useThemeMode();
 
   if (loading) {
     return (
@@ -177,15 +179,15 @@ export default function UserList({ users, loading, onDelete, onToggleActive }) {
               alignItems: 'center',
               gap: 2,
               p: 2,
-              borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+              borderBottom: `1px solid ${colors.borderLight}`,
             }}
           >
-            <Skeleton variant="circular" width={40} height={40} sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
+            <Skeleton variant="circular" width={40} height={40} sx={{ bgcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }} />
             <Box sx={{ flex: 1 }}>
-              <Skeleton variant="text" width="60%" sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
-              <Skeleton variant="text" width="40%" sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
+              <Skeleton variant="text" width="60%" sx={{ bgcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }} />
+              <Skeleton variant="text" width="40%" sx={{ bgcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }} />
             </Box>
-            <Skeleton variant="rounded" width={60} height={24} sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
+            <Skeleton variant="rounded" width={60} height={24} sx={{ bgcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }} />
           </Box>
         ))}
       </Box>
@@ -195,8 +197,8 @@ export default function UserList({ users, loading, onDelete, onToggleActive }) {
   if (!users || users.length === 0) {
     return (
       <Box sx={{ py: 6, textAlign: 'center' }}>
-        <HelpOutlineIcon sx={{ fontSize: 48, color: '#64748b', mb: 2 }} />
-        <Typography sx={{ color: '#94a3b8' }}>
+        <HelpOutlineIcon sx={{ fontSize: 48, color: colors.textSecondary, mb: 2 }} />
+        <Typography sx={{ color: colors.textSecondary }}>
           Chưa có người dùng nào
         </Typography>
       </Box>
@@ -227,6 +229,7 @@ export default function UserList({ users, loading, onDelete, onToggleActive }) {
             user={user}
             onDelete={onDelete}
             onToggleActive={onToggleActive}
+            colors={colors}
           />
         ))}
         <TablePagination
@@ -239,8 +242,8 @@ export default function UserList({ users, loading, onDelete, onToggleActive }) {
           onRowsPerPageChange={handleChangeRowsPerPage}
           labelRowsPerPage=""
           sx={{
-            color: '#94a3b8',
-            borderTop: '1px solid rgba(255,255,255,0.1)',
+            color: colors.textSecondary,
+            borderTop: `1px solid ${colors.border}`,
             '& .MuiTablePagination-selectLabel': {
               display: 'none',
             },
@@ -251,7 +254,7 @@ export default function UserList({ users, loading, onDelete, onToggleActive }) {
               display: 'none',
             },
             '& .MuiIconButton-root': {
-              color: '#94a3b8',
+              color: colors.textSecondary,
             },
             '& .MuiTablePagination-displayedRows': {
               fontSize: '0.75rem',
@@ -269,22 +272,22 @@ export default function UserList({ users, loading, onDelete, onToggleActive }) {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ color: '#94a3b8', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+              <TableCell sx={{ color: colors.textSecondary, fontWeight: 600, borderBottom: `1px solid ${colors.border}` }}>
                 Người dùng
               </TableCell>
-              <TableCell sx={{ color: '#94a3b8', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+              <TableCell sx={{ color: colors.textSecondary, fontWeight: 600, borderBottom: `1px solid ${colors.border}` }}>
                 UID Thẻ
               </TableCell>
-              <TableCell sx={{ color: '#94a3b8', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+              <TableCell sx={{ color: colors.textSecondary, fontWeight: 600, borderBottom: `1px solid ${colors.border}` }}>
                 Vai trò
               </TableCell>
-              <TableCell sx={{ color: '#94a3b8', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+              <TableCell sx={{ color: colors.textSecondary, fontWeight: 600, borderBottom: `1px solid ${colors.border}` }}>
                 Ngày tạo
               </TableCell>
-              <TableCell sx={{ color: '#94a3b8', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+              <TableCell sx={{ color: colors.textSecondary, fontWeight: 600, borderBottom: `1px solid ${colors.border}` }}>
                 Trạng thái
               </TableCell>
-              <TableCell align="center" sx={{ color: '#94a3b8', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+              <TableCell align="center" sx={{ color: colors.textSecondary, fontWeight: 600, borderBottom: `1px solid ${colors.border}` }}>
                 Hành động
               </TableCell>
             </TableRow>
@@ -296,11 +299,11 @@ export default function UserList({ users, loading, onDelete, onToggleActive }) {
                 sx={{
                   transition: 'all 0.2s ease',
                   '&:hover': {
-                    background: 'rgba(255, 255, 255, 0.03)',
+                    background: colors.bgHover,
                   },
                 }}
               >
-                <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <TableCell sx={{ borderBottom: `1px solid ${colors.borderLight}` }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                     <Avatar
                       sx={{
@@ -319,16 +322,16 @@ export default function UserList({ users, loading, onDelete, onToggleActive }) {
                       )}
                     </Avatar>
                     <Box>
-                      <Typography variant="body2" sx={{ color: '#f1f5f9', fontWeight: 500 }}>
+                      <Typography variant="body2" sx={{ color: colors.textPrimary, fontWeight: 500 }}>
                         {user.name}
                       </Typography>
-                      <Typography variant="caption" sx={{ color: '#64748b' }}>
+                      <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                         {user.email || 'Chưa có email'}
                       </Typography>
                     </Box>
                   </Box>
                 </TableCell>
-                <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <TableCell sx={{ borderBottom: `1px solid ${colors.borderLight}` }}>
                   {user.cardUid ? (
                     <Box
                       sx={{
@@ -353,12 +356,12 @@ export default function UserList({ users, loading, onDelete, onToggleActive }) {
                       </Typography>
                     </Box>
                   ) : (
-                    <Typography variant="caption" sx={{ color: '#64748b', fontStyle: 'italic' }}>
+                    <Typography variant="caption" sx={{ color: colors.textSecondary, fontStyle: 'italic' }}>
                       Chưa có thẻ
                     </Typography>
                   )}
                 </TableCell>
-                <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <TableCell sx={{ borderBottom: `1px solid ${colors.borderLight}` }}>
                   <Chip
                     icon={user.role === 'admin' ? <AdminPanelSettingsIcon /> : <PersonIcon />}
                     label={user.role === 'admin' ? 'Admin' : 'User'}
@@ -376,14 +379,14 @@ export default function UserList({ users, loading, onDelete, onToggleActive }) {
                     }}
                   />
                 </TableCell>
-                <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                  <Typography variant="body2" sx={{ color: '#94a3b8' }}>
+                <TableCell sx={{ borderBottom: `1px solid ${colors.borderLight}` }}>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                     {user.createdAt
                       ? dayjs(user.createdAt).format('DD/MM/YYYY')
                       : '-'}
                   </Typography>
                 </TableCell>
-                <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <TableCell sx={{ borderBottom: `1px solid ${colors.borderLight}` }}>
                   <Tooltip title={user.isActive ? 'Đang hoạt động' : 'Đã vô hiệu hóa'}>
                     <Switch
                       checked={user.isActive}
@@ -402,7 +405,7 @@ export default function UserList({ users, loading, onDelete, onToggleActive }) {
                     />
                   </Tooltip>
                 </TableCell>
-                <TableCell align="center" sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <TableCell align="center" sx={{ borderBottom: `1px solid ${colors.borderLight}` }}>
                   <Tooltip title="Xóa người dùng">
                     <IconButton
                       onClick={() => onDelete(user.id, user.name)}
@@ -434,13 +437,13 @@ export default function UserList({ users, loading, onDelete, onToggleActive }) {
         onRowsPerPageChange={handleChangeRowsPerPage}
         labelRowsPerPage="Số dòng:"
         sx={{
-          color: '#94a3b8',
-          borderTop: '1px solid rgba(255,255,255,0.1)',
+          color: colors.textSecondary,
+          borderTop: `1px solid ${colors.border}`,
           '& .MuiTablePagination-selectIcon': {
-            color: '#94a3b8',
+            color: colors.textSecondary,
           },
           '& .MuiIconButton-root': {
-            color: '#94a3b8',
+            color: colors.textSecondary,
           },
         }}
       />

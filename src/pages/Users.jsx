@@ -6,9 +6,11 @@ import ConfirmDialog from '../components/common/ConfirmDialog';
 import { useUsers } from '../hooks/useUsers';
 import PeopleIcon from '@mui/icons-material/People';
 import GroupIcon from '@mui/icons-material/Group';
+import { useThemeMode } from '../contexts/ThemeContext';
 
 export default function Users() {
   const { users, loading, error, addUser, deleteUser, toggleUserActive } = useUsers();
+  const { colors } = useThemeMode();
   const [confirmDialog, setConfirmDialog] = useState({
     open: false,
     type: 'warning',
@@ -46,14 +48,14 @@ export default function Users() {
           variant="h4"
           sx={{
             fontWeight: 700,
-            color: '#f1f5f9',
+            color: colors.textPrimary,
             mb: 0.5,
             fontSize: { xs: '1.5rem', sm: '2rem' },
           }}
         >
           Quản lý người dùng
         </Typography>
-        <Typography variant="body1" sx={{ color: '#94a3b8', fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+        <Typography variant="body1" sx={{ color: colors.textSecondary, fontSize: { xs: '0.875rem', sm: '1rem' } }}>
           Đăng ký và quản lý thẻ NFC cho người dùng trong hệ thống
         </Typography>
       </Box>
@@ -82,8 +84,8 @@ export default function Users() {
             sx={{
               p: 2,
               borderRadius: 2,
-              background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9))',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              background: colors.bgCard,
+              border: `1px solid ${colors.border}`,
             }}
           >
             <AddUserForm onAdd={addUser} />
@@ -96,8 +98,8 @@ export default function Users() {
             sx={{
               p: { xs: 2, sm: 3 },
               borderRadius: { xs: 2, sm: 4 },
-              background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9))',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              background: colors.bgCard,
+              border: `1px solid ${colors.border}`,
               height: '100%',
             }}
           >
@@ -115,10 +117,10 @@ export default function Users() {
                   <PeopleIcon sx={{ color: '#818cf8', fontSize: { xs: 20, sm: 24 } }} />
                 </Box>
                 <Box>
-                  <Typography variant="h6" sx={{ color: '#f1f5f9', fontWeight: 600, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
+                  <Typography variant="h6" sx={{ color: colors.textPrimary, fontWeight: 600, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
                     Danh sách người dùng
                   </Typography>
-                  <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: { xs: '0.65rem', sm: '0.75rem' } }}>
+                  <Typography variant="caption" sx={{ color: colors.textSecondary, fontSize: { xs: '0.65rem', sm: '0.75rem' } }}>
                     Tất cả thẻ NFC đã đăng ký
                   </Typography>
                 </Box>

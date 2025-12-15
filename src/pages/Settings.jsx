@@ -5,8 +5,10 @@ import TimerIcon from '@mui/icons-material/Timer';
 import InfoIcon from '@mui/icons-material/Info';
 import SaveIcon from '@mui/icons-material/Save';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { useThemeMode } from '../contexts/ThemeContext';
 
 export default function Settings() {
+  const { colors, isDark } = useThemeMode();
   const [config, setConfig] = useState({
     autoLockDelay: 5000,
     defaultDoorId: 'door_main',
@@ -52,10 +54,10 @@ export default function Settings() {
 
   const inputSx = {
     '& .MuiOutlinedInput-root': {
-      background: 'rgba(255, 255, 255, 0.03)',
+      background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)',
       borderRadius: 2,
       '& fieldset': {
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+        borderColor: colors.border,
       },
       '&:hover fieldset': {
         borderColor: 'rgba(99, 102, 241, 0.5)',
@@ -65,16 +67,16 @@ export default function Settings() {
       },
     },
     '& .MuiInputLabel-root': {
-      color: '#64748b',
+      color: colors.textSecondary,
     },
     '& .MuiInputLabel-root.Mui-focused': {
       color: '#818cf8',
     },
     '& .MuiOutlinedInput-input': {
-      color: '#f1f5f9',
+      color: colors.textPrimary,
     },
     '& .MuiFormHelperText-root': {
-      color: '#64748b',
+      color: colors.textSecondary,
     },
   };
 
@@ -82,15 +84,15 @@ export default function Settings() {
     return (
       <Box sx={{ animation: 'fadeIn 0.5s ease-out' }}>
         <Box sx={{ mb: 4 }}>
-          <Skeleton variant="text" width="200px" height={40} sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
-          <Skeleton variant="text" width="300px" height={24} sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
+          <Skeleton variant="text" width="200px" height={40} sx={{ bgcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }} />
+          <Skeleton variant="text" width="300px" height={24} sx={{ bgcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }} />
         </Box>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
-            <Skeleton variant="rounded" height={300} sx={{ bgcolor: 'rgba(255,255,255,0.1)', borderRadius: 4 }} />
+            <Skeleton variant="rounded" height={300} sx={{ bgcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)', borderRadius: 4 }} />
           </Grid>
           <Grid item xs={12} md={6}>
-            <Skeleton variant="rounded" height={300} sx={{ bgcolor: 'rgba(255,255,255,0.1)', borderRadius: 4 }} />
+            <Skeleton variant="rounded" height={300} sx={{ bgcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)', borderRadius: 4 }} />
           </Grid>
         </Grid>
       </Box>
@@ -105,13 +107,13 @@ export default function Settings() {
           variant="h4"
           sx={{
             fontWeight: 700,
-            color: '#f1f5f9',
+            color: colors.textPrimary,
             mb: 1,
           }}
         >
           Cài đặt hệ thống
         </Typography>
-        <Typography variant="body1" sx={{ color: '#94a3b8' }}>
+        <Typography variant="body1" sx={{ color: colors.textSecondary }}>
           Cấu hình các thông số hoạt động của hệ thống
         </Typography>
       </Box>
@@ -141,8 +143,8 @@ export default function Settings() {
             sx={{
               p: 3,
               borderRadius: 4,
-              background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9))',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              background: colors.bgCard,
+              border: `1px solid ${colors.border}`,
             }}
           >
             {/* Section Header */}
@@ -157,10 +159,10 @@ export default function Settings() {
                 <SettingsIcon sx={{ color: '#818cf8' }} />
               </Box>
               <Box>
-                <Typography variant="h6" sx={{ color: '#f1f5f9', fontWeight: 600 }}>
+                <Typography variant="h6" sx={{ color: colors.textPrimary, fontWeight: 600 }}>
                   Cấu hình chung
                 </Typography>
-                <Typography variant="caption" sx={{ color: '#94a3b8' }}>
+                <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                   Điều chỉnh các thông số hệ thống
                 </Typography>
               </Box>
@@ -177,7 +179,7 @@ export default function Settings() {
               sx={{ ...inputSx, mb: 3 }}
               InputProps={{
                 startAdornment: (
-                  <Box sx={{ mr: 1, color: '#64748b' }}>
+                  <Box sx={{ mr: 1, color: colors.textSecondary }}>
                     <TimerIcon fontSize="small" />
                   </Box>
                 ),
@@ -231,8 +233,8 @@ export default function Settings() {
             sx={{
               p: 3,
               borderRadius: 4,
-              background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9))',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              background: colors.bgCard,
+              border: `1px solid ${colors.border}`,
             }}
           >
             {/* Section Header */}
@@ -247,10 +249,10 @@ export default function Settings() {
                 <InfoIcon sx={{ color: '#818cf8' }} />
               </Box>
               <Box>
-                <Typography variant="h6" sx={{ color: '#f1f5f9', fontWeight: 600 }}>
+                <Typography variant="h6" sx={{ color: colors.textPrimary, fontWeight: 600 }}>
                   Thông tin hệ thống
                 </Typography>
-                <Typography variant="caption" sx={{ color: '#94a3b8' }}>
+                <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                   Kiến trúc và kết nối
                 </Typography>
               </Box>
@@ -271,11 +273,11 @@ export default function Settings() {
                     alignItems: 'center',
                     p: 2,
                     borderRadius: 2,
-                    background: 'rgba(255, 255, 255, 0.03)',
-                    border: '1px solid rgba(255, 255, 255, 0.05)',
+                    background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)',
+                    border: `1px solid ${colors.borderLight}`,
                   }}
                 >
-                  <Typography variant="body2" sx={{ color: '#94a3b8' }}>
+                  <Typography variant="body2" sx={{ color: colors.textSecondary }}>
                     {item.label}
                   </Typography>
                   <Typography

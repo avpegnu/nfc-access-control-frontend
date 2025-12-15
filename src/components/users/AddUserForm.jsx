@@ -18,8 +18,10 @@ import EmailIcon from '@mui/icons-material/Email';
 import BadgeIcon from '@mui/icons-material/Badge';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import InfoIcon from '@mui/icons-material/Info';
+import { useThemeMode } from '../../contexts/ThemeContext';
 
-export default function   AddUserForm({ onAdd }) {
+export default function AddUserForm({ onAdd }) {
+  const { colors, isDark } = useThemeMode();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -72,10 +74,10 @@ export default function   AddUserForm({ onAdd }) {
 
   const inputSx = {
     '& .MuiOutlinedInput-root': {
-      background: 'rgba(255, 255, 255, 0.03)',
+      background: colors.bgInput,
       borderRadius: 2,
       '& fieldset': {
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+        borderColor: colors.border,
       },
       '&:hover fieldset': {
         borderColor: 'rgba(99, 102, 241, 0.5)',
@@ -85,16 +87,16 @@ export default function   AddUserForm({ onAdd }) {
       },
     },
     '& .MuiInputLabel-root': {
-      color: '#64748b',
+      color: colors.textSecondary,
     },
     '& .MuiInputLabel-root.Mui-focused': {
       color: '#818cf8',
     },
     '& .MuiOutlinedInput-input': {
-      color: '#f1f5f9',
+      color: colors.textPrimary,
     },
     '& .MuiInputAdornment-root': {
-      color: '#64748b',
+      color: colors.textSecondary,
     },
   };
 
@@ -113,10 +115,10 @@ export default function   AddUserForm({ onAdd }) {
           <PersonAddIcon sx={{ color: '#818cf8', fontSize: { xs: 20, sm: 24 } }} />
         </Box>
         <Box>
-          <Typography variant="h6" sx={{ color: '#f1f5f9', fontWeight: 600, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
+          <Typography variant="h6" sx={{ color: colors.textPrimary, fontWeight: 600, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
             Thêm người dùng mới
           </Typography>
-          <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: { xs: '0.65rem', sm: '0.75rem' } }}>
+          <Typography variant="caption" sx={{ color: colors.textSecondary, fontSize: { xs: '0.65rem', sm: '0.75rem' } }}>
             Tạo người dùng để gán vào thẻ NFC
           </Typography>
         </Box>

@@ -23,17 +23,18 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import dayjs from 'dayjs';
 import { useState } from 'react';
+import { useThemeMode } from '../../contexts/ThemeContext';
 
 // Mobile Card Component
-function MobileLogCard({ log }) {
+function MobileLogCard({ log, colors, isDark }) {
   return (
     <Box
       sx={{
         p: 2,
         mb: 1.5,
         borderRadius: 2,
-        background: 'rgba(255, 255, 255, 0.03)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
+        background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)',
+        border: `1px solid ${colors.borderLight}`,
         transition: 'all 0.2s ease',
       }}
     >
@@ -53,7 +54,7 @@ function MobileLogCard({ log }) {
             {log.userName ? log.userName.charAt(0).toUpperCase() : <PersonIcon sx={{ fontSize: 16 }} />}
           </Avatar>
           <Box>
-            <Typography variant="body2" sx={{ color: '#f1f5f9', fontWeight: 500, fontSize: '0.875rem' }}>
+            <Typography variant="body2" sx={{ color: colors.textPrimary, fontWeight: 500, fontSize: '0.875rem' }}>
               {log.userName || 'Không xác định'}
             </Typography>
           </Box>
@@ -126,8 +127,8 @@ function MobileLogCard({ log }) {
 
         {/* Time */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <AccessTimeIcon sx={{ fontSize: 12, color: '#64748b' }} />
-          <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.7rem' }}>
+          <AccessTimeIcon sx={{ fontSize: 12, color: colors.textSecondary }} />
+          <Typography variant="caption" sx={{ color: colors.textSecondary, fontSize: '0.7rem' }}>
             {dayjs(log.timestamp).format('HH:mm DD/MM')}
           </Typography>
         </Box>
@@ -148,6 +149,7 @@ export default function AccessHistoryTable({ logs, loading }) {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { colors, isDark } = useThemeMode();
 
   if (loading) {
     return (
@@ -160,15 +162,15 @@ export default function AccessHistoryTable({ logs, loading }) {
               alignItems: 'center',
               gap: 2,
               p: 2,
-              borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+              borderBottom: `1px solid ${colors.borderLight}`,
             }}
           >
-            <Skeleton variant="circular" width={40} height={40} sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
+            <Skeleton variant="circular" width={40} height={40} sx={{ bgcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }} />
             <Box sx={{ flex: 1 }}>
-              <Skeleton variant="text" width="60%" sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
-              <Skeleton variant="text" width="40%" sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
+              <Skeleton variant="text" width="60%" sx={{ bgcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }} />
+              <Skeleton variant="text" width="40%" sx={{ bgcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }} />
             </Box>
-            <Skeleton variant="rounded" width={80} height={24} sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
+            <Skeleton variant="rounded" width={80} height={24} sx={{ bgcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }} />
           </Box>
         ))}
       </Box>
@@ -178,8 +180,8 @@ export default function AccessHistoryTable({ logs, loading }) {
   if (!logs || logs.length === 0) {
     return (
       <Box sx={{ py: 6, textAlign: 'center' }}>
-        <HelpOutlineIcon sx={{ fontSize: 48, color: '#64748b', mb: 2 }} />
-        <Typography sx={{ color: '#94a3b8' }}>
+        <HelpOutlineIcon sx={{ fontSize: 48, color: colors.textSecondary, mb: 2 }} />
+        <Typography sx={{ color: colors.textSecondary }}>
           Chưa có lịch sử truy cập
         </Typography>
       </Box>
@@ -205,7 +207,7 @@ export default function AccessHistoryTable({ logs, loading }) {
     return (
       <Box>
         {paginatedLogs.map((log) => (
-          <MobileLogCard key={log.id} log={log} />
+          <MobileLogCard key={log.id} log={log} colors={colors} isDark={isDark} />
         ))}
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
@@ -217,8 +219,8 @@ export default function AccessHistoryTable({ logs, loading }) {
           onRowsPerPageChange={handleChangeRowsPerPage}
           labelRowsPerPage=""
           sx={{
-            color: '#94a3b8',
-            borderTop: '1px solid rgba(255,255,255,0.1)',
+            color: colors.textSecondary,
+            borderTop: `1px solid ${colors.border}`,
             '& .MuiTablePagination-selectLabel': {
               display: 'none',
             },
@@ -229,7 +231,7 @@ export default function AccessHistoryTable({ logs, loading }) {
               display: 'none',
             },
             '& .MuiIconButton-root': {
-              color: '#94a3b8',
+              color: colors.textSecondary,
             },
             '& .MuiTablePagination-displayedRows': {
               fontSize: '0.75rem',
@@ -247,19 +249,19 @@ export default function AccessHistoryTable({ logs, loading }) {
         <Table stickyHeader>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ color: '#94a3b8', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(15, 23, 42, 0.95)' }}>
+              <TableCell sx={{ color: colors.textSecondary, fontWeight: 600, borderBottom: `1px solid ${colors.border}`, background: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)' }}>
                 Người dùng
               </TableCell>
-              <TableCell sx={{ color: '#94a3b8', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(15, 23, 42, 0.95)' }}>
+              <TableCell sx={{ color: colors.textSecondary, fontWeight: 600, borderBottom: `1px solid ${colors.border}`, background: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)' }}>
                 UID Thẻ
               </TableCell>
-              <TableCell sx={{ color: '#94a3b8', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(15, 23, 42, 0.95)' }}>
+              <TableCell sx={{ color: colors.textSecondary, fontWeight: 600, borderBottom: `1px solid ${colors.border}`, background: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)' }}>
                 Thời gian
               </TableCell>
-              <TableCell sx={{ color: '#94a3b8', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(15, 23, 42, 0.95)' }}>
+              <TableCell sx={{ color: colors.textSecondary, fontWeight: 600, borderBottom: `1px solid ${colors.border}`, background: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)' }}>
                 Hành động
               </TableCell>
-              <TableCell sx={{ color: '#94a3b8', fontWeight: 600, borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(15, 23, 42, 0.95)' }}>
+              <TableCell sx={{ color: colors.textSecondary, fontWeight: 600, borderBottom: `1px solid ${colors.border}`, background: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)' }}>
                 Kết quả
               </TableCell>
             </TableRow>
@@ -271,11 +273,11 @@ export default function AccessHistoryTable({ logs, loading }) {
                 sx={{
                   transition: 'all 0.2s ease',
                   '&:hover': {
-                    background: 'rgba(255, 255, 255, 0.03)',
+                    background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)',
                   },
                 }}
               >
-                <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <TableCell sx={{ borderBottom: `1px solid ${colors.borderLight}` }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                     <Avatar
                       sx={{
@@ -290,18 +292,18 @@ export default function AccessHistoryTable({ logs, loading }) {
                       {log.userName ? log.userName.charAt(0).toUpperCase() : <PersonIcon fontSize="small" />}
                     </Avatar>
                     <Box>
-                      <Typography variant="body2" sx={{ color: '#f1f5f9', fontWeight: 500 }}>
+                      <Typography variant="body2" sx={{ color: colors.textPrimary, fontWeight: 500 }}>
                         {log.userName || 'Không xác định'}
                       </Typography>
                       {log.userId && (
-                        <Typography variant="caption" sx={{ color: '#64748b' }}>
+                        <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                           {log.userId.slice(0, 12)}...
                         </Typography>
                       )}
                     </Box>
                   </Box>
                 </TableCell>
-                <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <TableCell sx={{ borderBottom: `1px solid ${colors.borderLight}` }}>
                   <Box
                     sx={{
                       display: 'inline-block',
@@ -325,17 +327,17 @@ export default function AccessHistoryTable({ logs, loading }) {
                     </Typography>
                   </Box>
                 </TableCell>
-                <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <TableCell sx={{ borderBottom: `1px solid ${colors.borderLight}` }}>
                   <Box>
-                    <Typography variant="body2" sx={{ color: '#f1f5f9' }}>
+                    <Typography variant="body2" sx={{ color: colors.textPrimary }}>
                       {dayjs(log.timestamp).format('HH:mm:ss')}
                     </Typography>
-                    <Typography variant="caption" sx={{ color: '#64748b' }}>
+                    <Typography variant="caption" sx={{ color: colors.textSecondary }}>
                       {dayjs(log.timestamp).format('DD/MM/YYYY')}
                     </Typography>
                   </Box>
                 </TableCell>
-                <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <TableCell sx={{ borderBottom: `1px solid ${colors.borderLight}` }}>
                   <Chip
                     icon={log.action === 'entry' ? <LoginIcon /> : <LogoutIcon />}
                     label={log.action === 'entry' ? 'Vào' : 'Ra'}
@@ -353,7 +355,7 @@ export default function AccessHistoryTable({ logs, loading }) {
                     }}
                   />
                 </TableCell>
-                <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <TableCell sx={{ borderBottom: `1px solid ${colors.borderLight}` }}>
                   <Chip
                     icon={log.result === 'granted' ? <CheckCircleIcon /> : <CancelIcon />}
                     label={log.result === 'granted' ? 'Cho phép' : 'Từ chối'}
@@ -371,7 +373,7 @@ export default function AccessHistoryTable({ logs, loading }) {
                     }}
                   />
                   {log.reason && (
-                    <Typography variant="caption" display="block" sx={{ color: '#64748b', mt: 0.5 }}>
+                    <Typography variant="caption" display="block" sx={{ color: colors.textSecondary, mt: 0.5 }}>
                       {log.reason}
                     </Typography>
                   )}
@@ -392,19 +394,19 @@ export default function AccessHistoryTable({ logs, loading }) {
         labelRowsPerPage="Số dòng:"
         sx={{
           flexShrink: 0,
-          color: '#94a3b8',
-          borderTop: '1px solid rgba(255,255,255,0.1)',
+          color: colors.textSecondary,
+          borderTop: `1px solid ${colors.border}`,
           '& .MuiTablePagination-selectIcon': {
-            color: '#94a3b8',
+            color: colors.textSecondary,
           },
           '& .MuiIconButton-root': {
-            color: '#94a3b8',
+            color: colors.textSecondary,
           },
           '& .MuiInputBase-root': {
-            color: '#94a3b8',
+            color: colors.textSecondary,
           },
           '& .MuiTablePagination-menuItem': {
-            color: '#1e293b',
+            color: isDark ? '#f1f5f9' : '#1e293b',
           },
         }}
       />

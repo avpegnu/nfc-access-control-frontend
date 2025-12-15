@@ -3,9 +3,11 @@ import { Outlet } from 'react-router-dom';
 import { Box, Toolbar } from '@mui/material';
 import Navbar from './Navbar';
 import Sidebar, { drawerWidth } from './Sidebar';
+import { useThemeMode } from '../../contexts/ThemeContext';
 
 export default function Layout() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { isDark, colors } = useThemeMode();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -16,7 +18,9 @@ export default function Layout() {
       sx={{
         display: 'flex',
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)',
+        background: isDark
+          ? 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)'
+          : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f8fafc 100%)',
       }}
     >
       <Navbar onMenuClick={handleDrawerToggle} />
@@ -41,7 +45,9 @@ export default function Layout() {
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'radial-gradient(ellipse at top right, rgba(99, 102, 241, 0.1), transparent 50%), radial-gradient(ellipse at bottom left, rgba(236, 72, 153, 0.1), transparent 50%)',
+            background: isDark
+              ? 'radial-gradient(ellipse at top right, rgba(99, 102, 241, 0.1), transparent 50%), radial-gradient(ellipse at bottom left, rgba(236, 72, 153, 0.1), transparent 50%)'
+              : 'radial-gradient(ellipse at top right, rgba(99, 102, 241, 0.05), transparent 50%), radial-gradient(ellipse at bottom left, rgba(236, 72, 153, 0.05), transparent 50%)',
             pointerEvents: 'none',
           }
         }}

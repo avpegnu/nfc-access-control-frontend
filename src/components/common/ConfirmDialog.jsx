@@ -14,6 +14,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import BlockIcon from '@mui/icons-material/Block';
 import RestoreIcon from '@mui/icons-material/Restore';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { useThemeMode } from '../../contexts/ThemeContext';
 
 const iconMap = {
   warning: { icon: WarningAmberIcon, color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.15)' },
@@ -34,6 +35,7 @@ export default function ConfirmDialog({
   onCancel,
   loading = false,
 }) {
+  const { colors, isDark } = useThemeMode();
   const iconConfig = iconMap[type] || iconMap.warning;
   const IconComponent = iconConfig.icon;
 
@@ -70,8 +72,10 @@ export default function ConfirmDialog({
       fullWidth
       PaperProps={{
         sx: {
-          background: 'linear-gradient(135deg, #1e293b, #0f172a)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          background: isDark
+            ? 'linear-gradient(135deg, #1e293b, #0f172a)'
+            : 'linear-gradient(135deg, #ffffff, #f8fafc)',
+          border: `1px solid ${colors.border}`,
           borderRadius: 3,
         },
       }}
@@ -81,7 +85,7 @@ export default function ConfirmDialog({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          color: '#f1f5f9',
+          color: colors.textPrimary,
           pb: 1,
         }}
       >
@@ -102,7 +106,7 @@ export default function ConfirmDialog({
             {title}
           </Typography>
         </Box>
-        <IconButton onClick={onCancel} size="small" sx={{ color: '#94a3b8' }}>
+        <IconButton onClick={onCancel} size="small" sx={{ color: colors.textSecondary }}>
           <CloseIcon fontSize="small" />
         </IconButton>
       </DialogTitle>
@@ -110,7 +114,7 @@ export default function ConfirmDialog({
       <DialogContent>
         <Typography
           sx={{
-            color: '#94a3b8',
+            color: colors.textSecondary,
             lineHeight: 1.6,
             mt: 1,
           }}
@@ -124,10 +128,10 @@ export default function ConfirmDialog({
           onClick={onCancel}
           disabled={loading}
           sx={{
-            color: '#94a3b8',
+            color: colors.textSecondary,
             px: 3,
             '&:hover': {
-              background: 'rgba(255, 255, 255, 0.05)',
+              background: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
             },
           }}
         >

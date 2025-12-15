@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { Box, Typography, Button, CircularProgress } from '@mui/material';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import LockIcon from '@mui/icons-material/Lock';
+import { useThemeMode } from '../../contexts/ThemeContext';
 
 export default function DoorControl({ status, onUnlock, onLock }) {
+  const { colors } = useThemeMode();
   const [loading, setLoading] = useState(false);
   const [activeButton, setActiveButton] = useState(null);
 
@@ -36,15 +38,15 @@ export default function DoorControl({ status, onUnlock, onLock }) {
       sx={{
         p: 2,
         borderRadius: 2,
-        background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9))',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
+        background: colors.bgCard,
+        border: `1px solid ${colors.border}`,
         minWidth: 0,
       }}
     >
       {/* Title */}
       <Typography
         sx={{
-          color: '#94a3b8',
+          color: colors.textSecondary,
           mb: 1.5,
           textAlign: 'center',
           fontSize: '0.7rem',

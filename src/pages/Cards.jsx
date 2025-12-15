@@ -43,6 +43,7 @@ import RestoreIcon from '@mui/icons-material/Restore';
 import { useCards } from '../hooks/useCards';
 import { useUsers } from '../hooks/useUsers';
 import ConfirmDialog from '../components/common/ConfirmDialog';
+import { useThemeMode } from '../contexts/ThemeContext';
 
 // Tab Panel Component
 function TabPanel({ children, value, index, ...other }) {
@@ -54,7 +55,7 @@ function TabPanel({ children, value, index, ...other }) {
 }
 
 // Mobile Card Component
-function MobileCardItem({ card, user, onAssign, onRevoke, onReactivate, onDelete }) {
+function MobileCardItem({ card, user, onAssign, onRevoke, onReactivate, onDelete, colors }) {
   const getStatusConfig = () => {
     if (card.status === 'revoked') {
       return { icon: <CancelIcon sx={{ fontSize: 14 }} />, label: 'Đã thu hồi', color: '#f87171', bg: 'rgba(239, 68, 68, 0.15)', border: 'rgba(239, 68, 68, 0.3)' };
@@ -73,8 +74,8 @@ function MobileCardItem({ card, user, onAssign, onRevoke, onReactivate, onDelete
         p: 2,
         mb: 1.5,
         borderRadius: 2,
-        background: 'rgba(255, 255, 255, 0.03)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
+        background: colors.bgHover,
+        border: `1px solid ${colors.borderLight}`,
         transition: 'all 0.2s ease',
       }}
     >
@@ -84,7 +85,7 @@ function MobileCardItem({ card, user, onAssign, onRevoke, onReactivate, onDelete
           <Typography
             variant="body2"
             sx={{
-              color: '#f1f5f9',
+              color: colors.textPrimary,
               fontFamily: 'monospace',
               fontWeight: 600,
               fontSize: '0.85rem',
@@ -92,7 +93,7 @@ function MobileCardItem({ card, user, onAssign, onRevoke, onReactivate, onDelete
           >
             {card.card_uid}
           </Typography>
-          <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.65rem' }}>
+          <Typography variant="caption" sx={{ color: colors.textSecondary, fontSize: '0.65rem' }}>
             {card.card_id}
           </Typography>
         </Box>
@@ -100,7 +101,7 @@ function MobileCardItem({ card, user, onAssign, onRevoke, onReactivate, onDelete
 
       {/* Info Row: User + Access Level */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5, flexWrap: 'wrap' }}>
-        <Typography variant="caption" sx={{ color: user ? '#f1f5f9' : '#64748b', fontStyle: user ? 'normal' : 'italic', fontSize: '0.75rem' }}>
+        <Typography variant="caption" sx={{ color: user ? colors.textPrimary : colors.textSecondary, fontStyle: user ? 'normal' : 'italic', fontSize: '0.75rem' }}>
           {user ? user.name : 'Chưa gán'}
         </Typography>
         {card.policy?.access_level && (
@@ -178,7 +179,7 @@ function MobileCardItem({ card, user, onAssign, onRevoke, onReactivate, onDelete
 }
 
 // Assign User Dialog
-function AssignUserDialog({ open, card, users, onClose, onAssign }) {
+function AssignUserDialog({ open, card, users, onClose, onAssign, colors }) {
   const [selectedUser, setSelectedUser] = useState('');
   const [accessLevel, setAccessLevel] = useState('staff');
   const [loading, setLoading] = useState(false);
@@ -198,29 +199,29 @@ function AssignUserDialog({ open, card, users, onClose, onAssign }) {
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ background: '#1e293b', color: '#f1f5f9' }}>
+      <DialogTitle sx={{ background: colors.bgSecondary, color: colors.textPrimary }}>
         Gán người dùng cho thẻ
       </DialogTitle>
-      <DialogContent sx={{ background: '#1e293b', pt: 2 }}>
+      <DialogContent sx={{ background: colors.bgSecondary, pt: 2 }}>
         <Box sx={{ mb: 2 }}>
-          <Typography variant="body2" sx={{ color: '#94a3b8', mb: 1 }}>
+          <Typography variant="body2" sx={{ color: colors.textSecondary, mb: 1 }}>
             Card ID: <strong style={{ color: '#818cf8' }}>{card?.card_id}</strong>
           </Typography>
-          <Typography variant="body2" sx={{ color: '#94a3b8' }}>
-            Card UID: <strong style={{ color: '#f1f5f9' }}>{card?.card_uid}</strong>
+          <Typography variant="body2" sx={{ color: colors.textSecondary }}>
+            Card UID: <strong style={{ color: colors.textPrimary }}>{card?.card_uid}</strong>
           </Typography>
         </Box>
 
         <FormControl fullWidth sx={{ mb: 2 }}>
-          <InputLabel sx={{ color: '#94a3b8' }}>Chọn người dùng</InputLabel>
+          <InputLabel sx={{ color: colors.textSecondary }}>Chọn người dùng</InputLabel>
           <Select
             value={selectedUser}
             onChange={(e) => setSelectedUser(e.target.value)}
             label="Chọn người dùng"
             sx={{
-              color: '#f1f5f9',
-              '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.2)' },
-              '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.3)' },
+              color: colors.textPrimary,
+              '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border },
+              '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: colors.borderLight },
             }}
           >
             {users.filter(u => u.isActive).map((user) => (
@@ -232,14 +233,14 @@ function AssignUserDialog({ open, card, users, onClose, onAssign }) {
         </FormControl>
 
         <FormControl fullWidth>
-          <InputLabel sx={{ color: '#94a3b8' }}>Quyền truy cập</InputLabel>
+          <InputLabel sx={{ color: colors.textSecondary }}>Quyền truy cập</InputLabel>
           <Select
             value={accessLevel}
             onChange={(e) => setAccessLevel(e.target.value)}
             label="Quyền truy cập"
             sx={{
-              color: '#f1f5f9',
-              '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.2)' },
+              color: colors.textPrimary,
+              '& .MuiOutlinedInput-notchedOutline': { borderColor: colors.border },
             }}
           >
             <MenuItem value="guest">Khách (Guest)</MenuItem>
@@ -249,8 +250,8 @@ function AssignUserDialog({ open, card, users, onClose, onAssign }) {
           </Select>
         </FormControl>
       </DialogContent>
-      <DialogActions sx={{ background: '#1e293b', p: 2 }}>
-        <Button onClick={onClose} sx={{ color: '#94a3b8' }}>
+      <DialogActions sx={{ background: colors.bgSecondary, p: 2 }}>
+        <Button onClick={onClose} sx={{ color: colors.textSecondary }}>
           Hủy
         </Button>
         <Button
@@ -270,7 +271,7 @@ function AssignUserDialog({ open, card, users, onClose, onAssign }) {
 }
 
 // Card Row Component
-function CardRow({ card, users, onAssign, onRevoke, onReactivate, onDelete }) {
+function CardRow({ card, users, onAssign, onRevoke, onReactivate, onDelete, colors }) {
   const user = users.find(u => u.id === card.user_id);
 
   const getStatusChip = () => {
@@ -317,17 +318,17 @@ function CardRow({ card, users, onAssign, onRevoke, onReactivate, onDelete }) {
   };
 
   return (
-    <TableRow sx={{ '&:hover': { background: 'rgba(255,255,255,0.02)' } }}>
-      <TableCell sx={{ color: '#818cf8', fontFamily: 'monospace', fontSize: '0.8rem' }}>
+    <TableRow sx={{ '&:hover': { background: colors.bgHover } }}>
+      <TableCell sx={{ color: '#818cf8', fontFamily: 'monospace', fontSize: '0.8rem', borderBottom: `1px solid ${colors.borderLight}` }}>
         {card.card_id}
       </TableCell>
-      <TableCell sx={{ color: '#f1f5f9', fontFamily: 'monospace', fontSize: '0.8rem' }}>
+      <TableCell sx={{ color: colors.textPrimary, fontFamily: 'monospace', fontSize: '0.8rem', borderBottom: `1px solid ${colors.borderLight}` }}>
         {card.card_uid}
       </TableCell>
-      <TableCell sx={{ color: '#f1f5f9' }}>
-        {user ? user.name : <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>Chưa gán</span>}
+      <TableCell sx={{ color: colors.textPrimary, borderBottom: `1px solid ${colors.borderLight}` }}>
+        {user ? user.name : <span style={{ color: colors.textSecondary, fontStyle: 'italic' }}>Chưa gán</span>}
       </TableCell>
-      <TableCell>
+      <TableCell sx={{ borderBottom: `1px solid ${colors.borderLight}` }}>
         {card.policy?.access_level && (
           <Chip
             label={card.policy.access_level}
@@ -340,8 +341,8 @@ function CardRow({ card, users, onAssign, onRevoke, onReactivate, onDelete }) {
           />
         )}
       </TableCell>
-      <TableCell>{getStatusChip()}</TableCell>
-      <TableCell>
+      <TableCell sx={{ borderBottom: `1px solid ${colors.borderLight}` }}>{getStatusChip()}</TableCell>
+      <TableCell sx={{ borderBottom: `1px solid ${colors.borderLight}` }}>
         <Box sx={{ display: 'flex', gap: 0.5 }}>
           {card.enroll_mode && card.status === 'active' && (
             <Tooltip title="Gán người dùng">
@@ -396,6 +397,7 @@ export default function Cards() {
   const { users } = useUsers();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { colors } = useThemeMode();
   const [tabValue, setTabValue] = useState(0);
   const [assignDialog, setAssignDialog] = useState({ open: false, card: null });
   const [confirmDialog, setConfirmDialog] = useState({
@@ -492,14 +494,14 @@ export default function Cards() {
           variant="h4"
           sx={{
             fontWeight: 700,
-            color: '#f1f5f9',
+            color: colors.textPrimary,
             mb: 0.5,
             fontSize: { xs: '1.5rem', sm: '2rem' },
           }}
         >
           Quản lý thẻ NFC
         </Typography>
-        <Typography variant="body1" sx={{ color: '#94a3b8', fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+        <Typography variant="body1" sx={{ color: colors.textSecondary, fontSize: { xs: '0.875rem', sm: '1rem' } }}>
           Quản lý và gán người dùng cho các thẻ NFC trong hệ thống
         </Typography>
       </Box>
@@ -559,8 +561,8 @@ export default function Cards() {
         sx={{
           p: { xs: 2, sm: 3 },
           borderRadius: { xs: 3, sm: 4 },
-          background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9))',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          background: colors.bgCard,
+          border: `1px solid ${colors.border}`,
         }}
       >
         {/* Header with refresh */}
@@ -575,7 +577,7 @@ export default function Cards() {
             >
               <CreditCardIcon sx={{ color: '#818cf8' }} />
             </Box>
-            <Typography variant="h6" sx={{ color: '#f1f5f9', fontWeight: 600 }}>
+            <Typography variant="h6" sx={{ color: colors.textPrimary, fontWeight: 600 }}>
               Danh sách thẻ
             </Typography>
           </Box>
@@ -607,7 +609,7 @@ export default function Cards() {
             <CircularProgress sx={{ color: '#818cf8' }} />
           </Box>
         ) : getDisplayCards().length === 0 ? (
-          <Box sx={{ textAlign: 'center', py: 4, color: '#94a3b8' }}>
+          <Box sx={{ textAlign: 'center', py: 4, color: colors.textSecondary }}>
             <CreditCardIcon sx={{ fontSize: 48, mb: 1, opacity: 0.5 }} />
             <Typography>Không có thẻ nào</Typography>
             <Typography variant="body2" sx={{ mt: 1 }}>
@@ -626,6 +628,7 @@ export default function Cards() {
                 onRevoke={handleRevoke}
                 onReactivate={handleReactivate}
                 onDelete={handleDelete}
+                colors={colors}
               />
             ))}
           </Box>
@@ -635,12 +638,12 @@ export default function Cards() {
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ color: '#94a3b8', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Card ID</TableCell>
-                  <TableCell sx={{ color: '#94a3b8', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Card UID</TableCell>
-                  <TableCell sx={{ color: '#94a3b8', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Người dùng</TableCell>
-                  <TableCell sx={{ color: '#94a3b8', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Quyền</TableCell>
-                  <TableCell sx={{ color: '#94a3b8', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Trạng thái</TableCell>
-                  <TableCell sx={{ color: '#94a3b8', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Thao tác</TableCell>
+                  <TableCell sx={{ color: colors.textSecondary, borderBottom: `1px solid ${colors.border}` }}>Card ID</TableCell>
+                  <TableCell sx={{ color: colors.textSecondary, borderBottom: `1px solid ${colors.border}` }}>Card UID</TableCell>
+                  <TableCell sx={{ color: colors.textSecondary, borderBottom: `1px solid ${colors.border}` }}>Người dùng</TableCell>
+                  <TableCell sx={{ color: colors.textSecondary, borderBottom: `1px solid ${colors.border}` }}>Quyền</TableCell>
+                  <TableCell sx={{ color: colors.textSecondary, borderBottom: `1px solid ${colors.border}` }}>Trạng thái</TableCell>
+                  <TableCell sx={{ color: colors.textSecondary, borderBottom: `1px solid ${colors.border}` }}>Thao tác</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -653,6 +656,7 @@ export default function Cards() {
                     onRevoke={handleRevoke}
                     onReactivate={handleReactivate}
                     onDelete={handleDelete}
+                    colors={colors}
                   />
                 ))}
               </TableBody>
@@ -668,6 +672,7 @@ export default function Cards() {
         users={users}
         onClose={() => setAssignDialog({ open: false, card: null })}
         onAssign={handleAssignSubmit}
+        colors={colors}
       />
 
       {/* Confirm Dialog */}

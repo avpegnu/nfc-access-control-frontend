@@ -3,9 +3,11 @@ import AccessHistoryTable from '../components/history/AccessHistoryTable';
 import { useAccessLogs } from '../hooks/useAccessLogs';
 import HistoryIcon from '@mui/icons-material/History';
 import EventNoteIcon from '@mui/icons-material/EventNote';
+import { useThemeMode } from '../contexts/ThemeContext';
 
 export default function History() {
   const { logs, loading } = useAccessLogs(100);
+  const { colors } = useThemeMode();
 
   return (
     <Box sx={{ animation: 'fadeIn 0.5s ease-out' }}>
@@ -15,14 +17,14 @@ export default function History() {
           variant="h4"
           sx={{
             fontWeight: 700,
-            color: '#f1f5f9',
+            color: colors.textPrimary,
             mb: 0.5,
             fontSize: { xs: '1.5rem', sm: '2rem' },
           }}
         >
           Lịch sử truy cập
         </Typography>
-        <Typography variant="body1" sx={{ color: '#94a3b8', fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+        <Typography variant="body1" sx={{ color: colors.textSecondary, fontSize: { xs: '0.875rem', sm: '1rem' } }}>
           Theo dõi tất cả hoạt động vào ra trong hệ thống
         </Typography>
       </Box>
@@ -32,8 +34,8 @@ export default function History() {
         sx={{
           p: { xs: 2, sm: 3 },
           borderRadius: { xs: 3, sm: 4 },
-          background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9))',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          background: colors.bgCard,
+          border: `1px solid ${colors.border}`,
         }}
       >
         {/* Section Header */}
@@ -49,10 +51,10 @@ export default function History() {
               <HistoryIcon sx={{ color: '#818cf8', fontSize: { xs: 20, sm: 24 } }} />
             </Box>
             <Box>
-              <Typography variant="h6" sx={{ color: '#f1f5f9', fontWeight: 600, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
+              <Typography variant="h6" sx={{ color: colors.textPrimary, fontWeight: 600, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
                 Nhật ký hoạt động
               </Typography>
-              <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: { xs: '0.65rem', sm: '0.75rem' } }}>
+              <Typography variant="caption" sx={{ color: colors.textSecondary, fontSize: { xs: '0.65rem', sm: '0.75rem' } }}>
                 Cập nhật theo thời gian thực
               </Typography>
             </Box>

@@ -11,6 +11,7 @@ import {
   CircularProgress
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
+import { useThemeMode } from '../contexts/ThemeContext';
 import LockIcon from '@mui/icons-material/Lock';
 import EmailIcon from '@mui/icons-material/Email';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -18,6 +19,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import DoorSlidingIcon from '@mui/icons-material/DoorSliding';
 
 export default function Login() {
+  const { colors, isDark } = useThemeMode();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -46,10 +48,10 @@ export default function Login() {
 
   const inputSx = {
     '& .MuiOutlinedInput-root': {
-      background: 'rgba(255, 255, 255, 0.03)',
+      background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)',
       borderRadius: 2,
       '& fieldset': {
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+        borderColor: colors.border,
       },
       '&:hover fieldset': {
         borderColor: 'rgba(99, 102, 241, 0.5)',
@@ -59,13 +61,13 @@ export default function Login() {
       },
     },
     '& .MuiInputLabel-root': {
-      color: '#64748b',
+      color: colors.textSecondary,
     },
     '& .MuiInputLabel-root.Mui-focused': {
       color: '#818cf8',
     },
     '& .MuiOutlinedInput-input': {
-      color: '#f1f5f9',
+      color: colors.textPrimary,
     },
   };
 
@@ -76,7 +78,9 @@ export default function Login() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)',
+        background: isDark
+          ? 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)'
+          : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f8fafc 100%)',
         p: 2,
       }}
     >
@@ -88,7 +92,9 @@ export default function Login() {
           left: '10%',
           width: '300px',
           height: '300px',
-          background: 'radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%)',
+          background: isDark
+            ? 'radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%)'
+            : 'radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%)',
           borderRadius: '50%',
           filter: 'blur(40px)',
           pointerEvents: 'none',
@@ -101,7 +107,9 @@ export default function Login() {
           right: '10%',
           width: '400px',
           height: '400px',
-          background: 'radial-gradient(circle, rgba(236, 72, 153, 0.1) 0%, transparent 70%)',
+          background: isDark
+            ? 'radial-gradient(circle, rgba(236, 72, 153, 0.1) 0%, transparent 70%)'
+            : 'radial-gradient(circle, rgba(236, 72, 153, 0.08) 0%, transparent 70%)',
           borderRadius: '50%',
           filter: 'blur(40px)',
           pointerEvents: 'none',
@@ -116,10 +124,14 @@ export default function Login() {
           maxWidth: 420,
           p: 4,
           borderRadius: 4,
-          background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95))',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          background: isDark
+            ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95))'
+            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.98))',
+          border: `1px solid ${colors.border}`,
           backdropFilter: 'blur(20px)',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+          boxShadow: isDark
+            ? '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+            : '0 25px 50px -12px rgba(0, 0, 0, 0.15)',
           position: 'relative',
           zIndex: 1,
         }}
@@ -146,7 +158,9 @@ export default function Login() {
             variant="h4"
             sx={{
               fontWeight: 700,
-              background: 'linear-gradient(135deg, #f1f5f9, #94a3b8)',
+              background: isDark
+                ? 'linear-gradient(135deg, #f1f5f9, #94a3b8)'
+                : 'linear-gradient(135deg, #1e293b, #475569)',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -155,7 +169,7 @@ export default function Login() {
           >
             Đăng nhập
           </Typography>
-          <Typography variant="body2" sx={{ color: '#64748b' }}>
+          <Typography variant="body2" sx={{ color: colors.textSecondary }}>
             Hệ thống kiểm soát vào ra NFC
           </Typography>
         </Box>
@@ -188,7 +202,7 @@ export default function Login() {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <EmailIcon sx={{ color: '#64748b' }} />
+                <EmailIcon sx={{ color: colors.textSecondary }} />
               </InputAdornment>
             ),
           }}
@@ -205,7 +219,7 @@ export default function Login() {
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <LockIcon sx={{ color: '#64748b' }} />
+                <LockIcon sx={{ color: colors.textSecondary }} />
               </InputAdornment>
             ),
             endAdornment: (
@@ -213,7 +227,7 @@ export default function Login() {
                 <IconButton
                   onClick={() => setShowPassword(!showPassword)}
                   edge="end"
-                  sx={{ color: '#64748b' }}
+                  sx={{ color: colors.textSecondary }}
                 >
                   {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                 </IconButton>
@@ -260,7 +274,7 @@ export default function Login() {
             display: 'block',
             textAlign: 'center',
             mt: 3,
-            color: '#64748b',
+            color: colors.textSecondary,
           }}
         >
           IoT Access Control System v1.0

@@ -19,6 +19,7 @@ import CreditCardIcon from '@mui/icons-material/CreditCard';
 import RouterIcon from '@mui/icons-material/Router';
 import SettingsIcon from '@mui/icons-material/Settings';
 import DoorSlidingIcon from '@mui/icons-material/DoorSliding';
+import { useThemeMode } from '../../contexts/ThemeContext';
 
 const drawerWidth = 260;
 
@@ -36,6 +37,7 @@ export default function Sidebar({ open, onClose }) {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { isDark, colors } = useThemeMode();
 
   const handleNavigation = (path) => {
     navigate(path);
@@ -50,7 +52,9 @@ export default function Sidebar({ open, onClose }) {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        background: 'linear-gradient(180deg, #0f172a 0%, #1e293b 100%)',
+        background: isDark
+          ? 'linear-gradient(180deg, #0f172a 0%, #1e293b 100%)'
+          : 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
       }}
     >
       <Toolbar />
@@ -67,7 +71,7 @@ export default function Sidebar({ open, onClose }) {
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
             <DoorSlidingIcon sx={{ color: '#6366f1' }} />
-            <Typography variant="subtitle2" sx={{ color: '#f1f5f9', fontWeight: 600 }}>
+            <Typography variant="subtitle2" sx={{ color: colors.textPrimary, fontWeight: 600 }}>
               Cửa chính
             </Typography>
           </Box>
@@ -81,7 +85,7 @@ export default function Sidebar({ open, onClose }) {
                 boxShadow: '0 0 10px #10b981',
               }}
             />
-            <Typography variant="caption" sx={{ color: '#94a3b8' }}>
+            <Typography variant="caption" sx={{ color: colors.textSecondary }}>
               Đang hoạt động
             </Typography>
           </Box>
@@ -109,14 +113,14 @@ export default function Sidebar({ open, onClose }) {
                     },
                   },
                   '&:hover': {
-                    background: 'rgba(255, 255, 255, 0.05)',
+                    background: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)',
                   },
                 }}
               >
                 <ListItemIcon
                   sx={{
                     minWidth: 40,
-                    color: isSelected ? '#818cf8' : '#94a3b8',
+                    color: isSelected ? '#818cf8' : colors.textSecondary,
                     transition: 'color 0.3s ease',
                   }}
                 >
@@ -126,7 +130,7 @@ export default function Sidebar({ open, onClose }) {
                   primary={item.text}
                   primaryTypographyProps={{
                     fontWeight: isSelected ? 600 : 400,
-                    color: isSelected ? '#f1f5f9' : '#94a3b8',
+                    color: isSelected ? colors.textPrimary : colors.textSecondary,
                     fontSize: '0.9rem',
                   }}
                 />
@@ -149,7 +153,7 @@ export default function Sidebar({ open, onClose }) {
 
       {/* Footer */}
       <Box sx={{ p: 2 }}>
-        <Typography variant="caption" sx={{ color: '#64748b', display: 'block', textAlign: 'center' }}>
+        <Typography variant="caption" sx={{ color: colors.textMuted, display: 'block', textAlign: 'center' }}>
           IoT Access Control v1.0
         </Typography>
       </Box>
@@ -160,7 +164,7 @@ export default function Sidebar({ open, onClose }) {
     '& .MuiDrawer-paper': {
       boxSizing: 'border-box',
       width: drawerWidth,
-      borderRight: '1px solid rgba(255, 255, 255, 0.1)',
+      borderRight: `1px solid ${colors.border}`,
       background: 'transparent',
     },
   };
