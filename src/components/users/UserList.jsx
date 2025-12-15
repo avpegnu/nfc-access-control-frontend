@@ -38,74 +38,65 @@ function MobileUserCard({ user, onDelete, onToggleActive }) {
         transition: 'all 0.2s ease',
       }}
     >
-      {/* Header: User + Status */}
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <Avatar
-            sx={{
-              width: 36,
-              height: 36,
-              background: user.role === 'admin'
-                ? 'linear-gradient(135deg, #ec4899, #db2777)'
-                : 'linear-gradient(135deg, #6366f1, #4f46e5)',
-              fontSize: '0.75rem',
-            }}
-          >
-            {user.role === 'admin' ? (
-              <AdminPanelSettingsIcon sx={{ fontSize: 18 }} />
-            ) : (
-              user.name ? user.name.charAt(0).toUpperCase() : <PersonIcon sx={{ fontSize: 18 }} />
-            )}
-          </Avatar>
-          <Box>
-            <Typography variant="body2" sx={{ color: '#f1f5f9', fontWeight: 500, fontSize: '0.875rem' }}>
-              {user.name}
-            </Typography>
-            <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.7rem' }}>
-              {user.email || 'Chưa có email'}
-            </Typography>
-          </Box>
-        </Box>
-        <Switch
-          checked={user.isActive}
-          onChange={() => onToggleActive(user.id, user.isActive)}
-          size="small"
+      {/* Row 1: User Info */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
+        <Avatar
           sx={{
-            '& .MuiSwitch-switchBase.Mui-checked': {
-              color: '#10b981',
-            },
-            '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-              backgroundColor: '#10b981',
-            },
-          }}
-        />
-      </Box>
-
-      {/* Info Row */}
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1 }}>
-        {/* Card UID */}
-        <Box
-          sx={{
-            display: 'inline-block',
-            px: 1,
-            py: 0.25,
-            borderRadius: 1,
-            background: 'rgba(99, 102, 241, 0.15)',
-            border: '1px solid rgba(99, 102, 241, 0.3)',
+            width: 36,
+            height: 36,
+            background: user.role === 'admin'
+              ? 'linear-gradient(135deg, #ec4899, #db2777)'
+              : 'linear-gradient(135deg, #6366f1, #4f46e5)',
+            fontSize: '0.75rem',
           }}
         >
-          <Typography
-            variant="caption"
-            sx={{
-              color: '#818cf8',
-              fontFamily: 'monospace',
-              fontWeight: 600,
-              fontSize: '0.7rem',
-            }}
-          >
-            {user.cardUid}
+          {user.role === 'admin' ? (
+            <AdminPanelSettingsIcon sx={{ fontSize: 18 }} />
+          ) : (
+            user.name ? user.name.charAt(0).toUpperCase() : <PersonIcon sx={{ fontSize: 18 }} />
+          )}
+        </Avatar>
+        <Box>
+          <Typography variant="body2" sx={{ color: '#f1f5f9', fontWeight: 500, fontSize: '0.875rem' }}>
+            {user.name}
+          </Typography>
+          <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.7rem' }}>
+            {user.email || 'Chưa có email'}
           </Typography>
         </Box>
+      </Box>
+
+      {/* Row 2: Card UID + Role + Date */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5, flexWrap: 'wrap' }}>
+        {/* Card UID */}
+        {user.cardUid ? (
+          <Box
+            sx={{
+              display: 'inline-block',
+              px: 1,
+              py: 0.25,
+              borderRadius: 1,
+              background: 'rgba(99, 102, 241, 0.15)',
+              border: '1px solid rgba(99, 102, 241, 0.3)',
+            }}
+          >
+            <Typography
+              variant="caption"
+              sx={{
+                color: '#818cf8',
+                fontFamily: 'monospace',
+                fontWeight: 600,
+                fontSize: '0.7rem',
+              }}
+            >
+              {user.cardUid}
+            </Typography>
+          </Box>
+        ) : (
+          <Typography variant="caption" sx={{ color: '#64748b', fontStyle: 'italic', fontSize: '0.7rem' }}>
+            Chưa có thẻ
+          </Typography>
+        )}
 
         {/* Role */}
         <Chip
@@ -134,15 +125,26 @@ function MobileUserCard({ user, onDelete, onToggleActive }) {
             {user.createdAt ? dayjs(user.createdAt).format('DD/MM/YY') : '-'}
           </Typography>
         </Box>
+      </Box>
 
-        {/* Delete */}
+      {/* Row 3: Actions (Switch + Delete) */}
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Switch
+          checked={user.isActive}
+          onChange={() => onToggleActive(user.id, user.isActive)}
+          size="small"
+          sx={{
+            '& .MuiSwitch-switchBase.Mui-checked': {
+              color: '#10b981',
+            },
+            '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+              backgroundColor: '#10b981',
+            },
+          }}
+        />
         <IconButton
           size="small"
-          onClick={() => {
-            if (window.confirm(`Bạn có chắc muốn xóa "${user.name}"?`)) {
-              onDelete(user.id, user.cardUid);
-            }
-          }}
+          onClick={() => onDelete(user.id, user.name)}
           sx={{
             color: '#f87171',
             p: 0.5,
@@ -327,28 +329,34 @@ export default function UserList({ users, loading, onDelete, onToggleActive }) {
                   </Box>
                 </TableCell>
                 <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                  <Box
-                    sx={{
-                      display: 'inline-block',
-                      px: 1.5,
-                      py: 0.5,
-                      borderRadius: 1.5,
-                      background: 'rgba(99, 102, 241, 0.15)',
-                      border: '1px solid rgba(99, 102, 241, 0.3)',
-                    }}
-                  >
-                    <Typography
-                      variant="caption"
+                  {user.cardUid ? (
+                    <Box
                       sx={{
-                        color: '#818cf8',
-                        fontFamily: 'monospace',
-                        fontWeight: 600,
-                        letterSpacing: '0.5px',
+                        display: 'inline-block',
+                        px: 1.5,
+                        py: 0.5,
+                        borderRadius: 1.5,
+                        background: 'rgba(99, 102, 241, 0.15)',
+                        border: '1px solid rgba(99, 102, 241, 0.3)',
                       }}
                     >
-                      {user.cardUid}
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: '#818cf8',
+                          fontFamily: 'monospace',
+                          fontWeight: 600,
+                          letterSpacing: '0.5px',
+                        }}
+                      >
+                        {user.cardUid}
+                      </Typography>
+                    </Box>
+                  ) : (
+                    <Typography variant="caption" sx={{ color: '#64748b', fontStyle: 'italic' }}>
+                      Chưa có thẻ
                     </Typography>
-                  </Box>
+                  )}
                 </TableCell>
                 <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                   <Chip
@@ -397,11 +405,7 @@ export default function UserList({ users, loading, onDelete, onToggleActive }) {
                 <TableCell align="center" sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                   <Tooltip title="Xóa người dùng">
                     <IconButton
-                      onClick={() => {
-                        if (window.confirm(`Bạn có chắc muốn xóa "${user.name}"?`)) {
-                          onDelete(user.id, user.cardUid);
-                        }
-                      }}
+                      onClick={() => onDelete(user.id, user.name)}
                       sx={{
                         color: '#f87171',
                         transition: 'all 0.2s ease',

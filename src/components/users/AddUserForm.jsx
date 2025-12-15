@@ -19,7 +19,7 @@ import BadgeIcon from '@mui/icons-material/Badge';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import InfoIcon from '@mui/icons-material/Info';
 
-export default function AddUserForm({ onAdd }) {
+export default function   AddUserForm({ onAdd }) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -107,6 +107,7 @@ export default function AddUserForm({ onAdd }) {
             p: { xs: 0.75, sm: 1 },
             borderRadius: { xs: 1.5, sm: 2 },
             background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(99, 102, 241, 0.1))',
+            display: 'flex',
           }}
         >
           <PersonAddIcon sx={{ color: '#818cf8', fontSize: { xs: 20, sm: 24 } }} />
@@ -232,7 +233,7 @@ export default function AddUserForm({ onAdd }) {
           type="submit"
           variant="contained"
           size="large"
-          startIcon={loading ? <CircularProgress size={18} color="inherit" /> : <PersonAddIcon />}
+          startIcon={loading ? <CircularProgress size={18} color="inherit" /> : <PersonAddIcon sx={{ fontSize: 20 }} />}
           disabled={loading}
           fullWidth
           sx={{

@@ -13,7 +13,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
   FormControl,
   InputLabel,
   Select,
@@ -28,17 +27,22 @@ import {
   Tooltip,
   Tabs,
   Tab,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import PersonIcon from '@mui/icons-material/Person';
 import BlockIcon from '@mui/icons-material/Block';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import CancelIcon from '@mui/icons-material/Cancel';
+import RestoreIcon from '@mui/icons-material/Restore';
 import { useCards } from '../hooks/useCards';
 import { useUsers } from '../hooks/useUsers';
+import ConfirmDialog from '../components/common/ConfirmDialog';
 
 // Tab Panel Component
 function TabPanel({ children, value, index, ...other }) {
@@ -46,6 +50,130 @@ function TabPanel({ children, value, index, ...other }) {
     <div role="tabpanel" hidden={value !== index} {...other}>
       {value === index && <Box sx={{ pt: 2 }}>{children}</Box>}
     </div>
+  );
+}
+
+// Mobile Card Component
+function MobileCardItem({ card, user, onAssign, onRevoke, onReactivate, onDelete }) {
+  const getStatusConfig = () => {
+    if (card.status === 'revoked') {
+      return { icon: <CancelIcon sx={{ fontSize: 14 }} />, label: 'Đã thu hồi', color: '#f87171', bg: 'rgba(239, 68, 68, 0.15)', border: 'rgba(239, 68, 68, 0.3)' };
+    }
+    if (card.enroll_mode) {
+      return { icon: <HourglassEmptyIcon sx={{ fontSize: 14 }} />, label: 'Chờ gán', color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.15)', border: 'rgba(251, 191, 36, 0.3)' };
+    }
+    return { icon: <CheckCircleIcon sx={{ fontSize: 14 }} />, label: 'Hoạt động', color: '#34d399', bg: 'rgba(16, 185, 129, 0.15)', border: 'rgba(16, 185, 129, 0.3)' };
+  };
+
+  const statusConfig = getStatusConfig();
+
+  return (
+    <Box
+      sx={{
+        p: 2,
+        mb: 1.5,
+        borderRadius: 2,
+        background: 'rgba(255, 255, 255, 0.03)',
+        border: '1px solid rgba(255, 255, 255, 0.08)',
+        transition: 'all 0.2s ease',
+      }}
+    >
+      {/* Header: Card UID */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
+        <Box>
+          <Typography
+            variant="body2"
+            sx={{
+              color: '#f1f5f9',
+              fontFamily: 'monospace',
+              fontWeight: 600,
+              fontSize: '0.85rem',
+            }}
+          >
+            {card.card_uid}
+          </Typography>
+          <Typography variant="caption" sx={{ color: '#64748b', fontSize: '0.65rem' }}>
+            {card.card_id}
+          </Typography>
+        </Box>
+      </Box>
+
+      {/* Info Row: User + Access Level */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5, flexWrap: 'wrap' }}>
+        <Typography variant="caption" sx={{ color: user ? '#f1f5f9' : '#64748b', fontStyle: user ? 'normal' : 'italic', fontSize: '0.75rem' }}>
+          {user ? user.name : 'Chưa gán'}
+        </Typography>
+        {card.policy?.access_level && (
+          <Chip
+            label={card.policy.access_level}
+            size="small"
+            sx={{
+              height: 20,
+              background: 'rgba(99, 102, 241, 0.15)',
+              color: '#818cf8',
+              textTransform: 'capitalize',
+              fontSize: '0.65rem',
+            }}
+          />
+        )}
+      </Box>
+
+      {/* Bottom Row: Status + Actions */}
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        {/* Status Chip */}
+        <Chip
+          icon={statusConfig.icon}
+          label={statusConfig.label}
+          size="small"
+          sx={{
+            height: 24,
+            background: statusConfig.bg,
+            color: statusConfig.color,
+            border: `1px solid ${statusConfig.border}`,
+            fontSize: '0.7rem',
+            '& .MuiChip-icon': { color: 'inherit' },
+          }}
+        />
+
+        {/* Actions */}
+        <Box sx={{ display: 'flex', gap: 0.5 }}>
+          {card.enroll_mode && card.status === 'active' && (
+            <IconButton
+              size="small"
+              onClick={() => onAssign(card)}
+              sx={{ color: '#818cf8', p: 0.5, '&:hover': { background: 'rgba(99, 102, 241, 0.1)' } }}
+            >
+              <PersonAddIcon sx={{ fontSize: 18 }} />
+            </IconButton>
+          )}
+          {card.status === 'active' && !card.enroll_mode && (
+            <IconButton
+              size="small"
+              onClick={() => onRevoke(card.card_id)}
+              sx={{ color: '#fbbf24', p: 0.5, '&:hover': { background: 'rgba(251, 191, 36, 0.1)' } }}
+            >
+              <BlockIcon sx={{ fontSize: 18 }} />
+            </IconButton>
+          )}
+          {card.status === 'revoked' && (
+            <IconButton
+              size="small"
+              onClick={() => onReactivate(card.card_id)}
+              sx={{ color: '#34d399', p: 0.5, '&:hover': { background: 'rgba(16, 185, 129, 0.1)' } }}
+            >
+              <RestoreIcon sx={{ fontSize: 18 }} />
+            </IconButton>
+          )}
+          <IconButton
+            size="small"
+            onClick={() => onDelete(card.card_id)}
+            sx={{ color: '#f87171', p: 0.5, '&:hover': { background: 'rgba(239, 68, 68, 0.1)' } }}
+          >
+            <DeleteIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+        </Box>
+      </Box>
+    </Box>
   );
 }
 
@@ -142,7 +270,7 @@ function AssignUserDialog({ open, card, users, onClose, onAssign }) {
 }
 
 // Card Row Component
-function CardRow({ card, users, onAssign, onRevoke, onDelete }) {
+function CardRow({ card, users, onAssign, onRevoke, onReactivate, onDelete }) {
   const user = users.find(u => u.id === card.user_id);
 
   const getStatusChip = () => {
@@ -237,6 +365,17 @@ function CardRow({ card, users, onAssign, onRevoke, onDelete }) {
               </IconButton>
             </Tooltip>
           )}
+          {card.status === 'revoked' && (
+            <Tooltip title="Kích hoạt lại thẻ">
+              <IconButton
+                size="small"
+                onClick={() => onReactivate(card.card_id)}
+                sx={{ color: '#34d399', '&:hover': { background: 'rgba(16, 185, 129, 0.1)' } }}
+              >
+                <RestoreIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
           <Tooltip title="Xóa thẻ">
             <IconButton
               size="small"
@@ -253,10 +392,20 @@ function CardRow({ card, users, onAssign, onRevoke, onDelete }) {
 }
 
 export default function Cards() {
-  const { cards, pendingCards, activeCards, revokedCards, loading, error, fetchCards, assignUser, revokeCard, deleteCard } = useCards();
+  const { cards, pendingCards, activeCards, revokedCards, loading, error, fetchCards, assignUser, revokeCard, reactivateCard, deleteCard } = useCards();
   const { users } = useUsers();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [tabValue, setTabValue] = useState(0);
   const [assignDialog, setAssignDialog] = useState({ open: false, card: null });
+  const [confirmDialog, setConfirmDialog] = useState({
+    open: false,
+    type: 'warning',
+    title: '',
+    message: '',
+    onConfirm: null,
+  });
+  const [actionLoading, setActionLoading] = useState(false);
 
   const handleAssign = (card) => {
     setAssignDialog({ open: true, card });
@@ -266,16 +415,58 @@ export default function Cards() {
     await assignUser(cardId, userId, policy);
   };
 
-  const handleRevoke = async (cardId) => {
-    if (window.confirm('Bạn có chắc muốn thu hồi thẻ này?')) {
-      await revokeCard(cardId, 'Admin revoked');
-    }
+  const handleRevoke = (cardId) => {
+    setConfirmDialog({
+      open: true,
+      type: 'block',
+      title: 'Thu hồi thẻ',
+      message: 'Bạn có chắc muốn thu hồi thẻ này? Người dùng sẽ không thể sử dụng thẻ để vào cửa sau khi thu hồi.',
+      onConfirm: async () => {
+        setActionLoading(true);
+        try {
+          await revokeCard(cardId, 'Admin revoked');
+        } finally {
+          setActionLoading(false);
+          setConfirmDialog(prev => ({ ...prev, open: false }));
+        }
+      },
+    });
   };
 
-  const handleDelete = async (cardId) => {
-    if (window.confirm('Bạn có chắc muốn xóa thẻ này? Hành động này không thể hoàn tác.')) {
-      await deleteCard(cardId);
-    }
+  const handleReactivate = (cardId) => {
+    setConfirmDialog({
+      open: true,
+      type: 'restore',
+      title: 'Kích hoạt lại thẻ',
+      message: 'Bạn có chắc muốn kích hoạt lại thẻ này? Thẻ sẽ hoạt động trở lại và người dùng có thể sử dụng để vào cửa.',
+      onConfirm: async () => {
+        setActionLoading(true);
+        try {
+          await reactivateCard(cardId);
+        } finally {
+          setActionLoading(false);
+          setConfirmDialog(prev => ({ ...prev, open: false }));
+        }
+      },
+    });
+  };
+
+  const handleDelete = (cardId) => {
+    setConfirmDialog({
+      open: true,
+      type: 'danger',
+      title: 'Xóa thẻ',
+      message: 'Bạn có chắc muốn xóa thẻ này? Hành động này không thể hoàn tác và tất cả dữ liệu liên quan sẽ bị mất.',
+      onConfirm: async () => {
+        setActionLoading(true);
+        try {
+          await deleteCard(cardId);
+        } finally {
+          setActionLoading(false);
+          setConfirmDialog(prev => ({ ...prev, open: false }));
+        }
+      },
+    });
   };
 
   const getDisplayCards = () => {
@@ -410,7 +601,7 @@ export default function Cards() {
           <Tab label={`Thu hồi (${revokedCards.length})`} />
         </Tabs>
 
-        {/* Table */}
+        {/* Content */}
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
             <CircularProgress sx={{ color: '#818cf8' }} />
@@ -423,7 +614,23 @@ export default function Cards() {
               Quẹt thẻ NFC trắng vào đầu đọc để thêm thẻ mới
             </Typography>
           </Box>
+        ) : isMobile ? (
+          /* Mobile Card View */
+          <Box>
+            {getDisplayCards().map((card) => (
+              <MobileCardItem
+                key={card.card_id}
+                card={card}
+                user={users.find(u => u.id === card.user_id)}
+                onAssign={handleAssign}
+                onRevoke={handleRevoke}
+                onReactivate={handleReactivate}
+                onDelete={handleDelete}
+              />
+            ))}
+          </Box>
         ) : (
+          /* Desktop Table View */
           <TableContainer>
             <Table size="small">
               <TableHead>
@@ -444,6 +651,7 @@ export default function Cards() {
                     users={users}
                     onAssign={handleAssign}
                     onRevoke={handleRevoke}
+                    onReactivate={handleReactivate}
                     onDelete={handleDelete}
                   />
                 ))}
@@ -460,6 +668,18 @@ export default function Cards() {
         users={users}
         onClose={() => setAssignDialog({ open: false, card: null })}
         onAssign={handleAssignSubmit}
+      />
+
+      {/* Confirm Dialog */}
+      <ConfirmDialog
+        open={confirmDialog.open}
+        type={confirmDialog.type}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        confirmText={confirmDialog.type === 'danger' ? 'Xóa' : confirmDialog.type === 'restore' ? 'Kích hoạt' : 'Thu hồi'}
+        onConfirm={confirmDialog.onConfirm}
+        onCancel={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
+        loading={actionLoading}
       />
     </Box>
   );

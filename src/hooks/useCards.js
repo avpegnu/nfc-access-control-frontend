@@ -80,6 +80,22 @@ export function useCards() {
     }
   };
 
+  const reactivateCard = async (cardId) => {
+    try {
+      setError(null);
+      const response = await api.reactivateCard(cardId);
+      if (response.success) {
+        setCards(prev => prev.map(card =>
+          card.card_id === cardId ? { ...card, status: 'active' } : card
+        ));
+        return response.data;
+      }
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
+  };
+
   const deleteCard = async (cardId) => {
     try {
       setError(null);
@@ -107,6 +123,7 @@ export function useCards() {
     assignUser,
     updateCard,
     revokeCard,
+    reactivateCard,
     deleteCard,
   };
 }

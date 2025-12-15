@@ -167,6 +167,12 @@ class ApiService {
     });
   }
 
+  async reactivateCard(cardId) {
+    return this.request(`/v1/cards/${cardId}/reactivate`, {
+      method: 'POST',
+    });
+  }
+
   async deleteCard(cardId) {
     return this.request(`/v1/cards/${cardId}`, {
       method: 'DELETE',
