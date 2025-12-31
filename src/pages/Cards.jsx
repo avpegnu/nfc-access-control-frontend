@@ -27,6 +27,8 @@ import {
   Tooltip,
   Tabs,
   Tab,
+  Switch,
+  FormControlLabel,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
@@ -59,11 +61,31 @@ function MobileCardItem({
   card,
   user,
   onAssign,
+  onUpdate,
   onRevoke,
   onReactivate,
   onDelete,
   colors,
 }) {
+  const handleToggleEnrollMode = async (e) => {
+    e.stopPropagation();
+    try {
+      await onUpdate(card.card_id, { enroll_mode: !card.enroll_mode });
+    } catch (err) {
+      console.error("Error toggling enroll mode:", err);
+    }
+  };
+
+  const handleToggleActive = async (e) => {
+    e.stopPropagation();
+    const newStatus = card.status === "active" ? "inactive" : "active";
+    try {
+      await onUpdate(card.card_id, { status: newStatus });
+    } catch (err) {
+      console.error("Error toggling active status:", err);
+    }
+  };
+
   const getStatusConfig = () => {
     if (card.status === "revoked") {
       return {
@@ -161,6 +183,60 @@ function MobileCardItem({
             }}
           />
         )}
+      </Box>
+
+      {/* Switches Row */}
+      <Box sx={{ display: "flex", gap: 2, mb: 1.5, alignItems: "center" }}>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={card.enroll_mode || false}
+              onChange={handleToggleEnrollMode}
+              size="small"
+              sx={{
+                "& .MuiSwitch-switchBase.Mui-checked": {
+                  color: "#fbbf24",
+                },
+                "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                  backgroundColor: "#fbbf24",
+                },
+              }}
+            />
+          }
+          label={
+            <Typography
+              variant="caption"
+              sx={{ color: colors.textSecondary, fontSize: "0.7rem" }}
+            >
+              Enroll
+            </Typography>
+          }
+        />
+        <FormControlLabel
+          control={
+            <Switch
+              checked={card.status === "active"}
+              onChange={handleToggleActive}
+              size="small"
+              sx={{
+                "& .MuiSwitch-switchBase.Mui-checked": {
+                  color: "#34d399",
+                },
+                "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                  backgroundColor: "#34d399",
+                },
+              }}
+            />
+          }
+          label={
+            <Typography
+              variant="caption"
+              sx={{ color: colors.textSecondary, fontSize: "0.7rem" }}
+            >
+              Active
+            </Typography>
+          }
+        />
       </Box>
 
       {/* Bottom Row: Status + Actions */}
@@ -364,12 +440,32 @@ function CardRow({
   card,
   users,
   onAssign,
+  onUpdate,
   onRevoke,
   onReactivate,
   onDelete,
   colors,
 }) {
   const user = users.find((u) => u.id === card.user_id);
+
+  const handleToggleEnrollMode = async (e) => {
+    e.stopPropagation();
+    try {
+      await onUpdate(card.card_id, { enroll_mode: !card.enroll_mode });
+    } catch (err) {
+      console.error("Error toggling enroll mode:", err);
+    }
+  };
+
+  const handleToggleActive = async (e) => {
+    e.stopPropagation();
+    const newStatus = card.status === "active" ? "inactive" : "active";
+    try {
+      await onUpdate(card.card_id, { status: newStatus });
+    } catch (err) {
+      console.error("Error toggling active status:", err);
+    }
+  };
 
   const getStatusChip = () => {
     if (card.status === "revoked") {
@@ -467,6 +563,42 @@ function CardRow({
         {getStatusChip()}
       </TableCell>
       <TableCell sx={{ borderBottom: `1px solid ${colors.borderLight}` }}>
+        <Tooltip
+          title={card.enroll_mode ? "Tắt chế độ ghi thẻ" : "Bật chế độ ghi thẻ"}
+        >
+          <Switch
+            checked={card.enroll_mode || false}
+            onChange={handleToggleEnrollMode}
+            size="small"
+            sx={{
+              "& .MuiSwitch-switchBase.Mui-checked": {
+                color: "#fbbf24",
+              },
+              "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                backgroundColor: "#fbbf24",
+              },
+            }}
+          />
+        </Tooltip>
+      </TableCell>
+      <TableCell sx={{ borderBottom: `1px solid ${colors.borderLight}` }}>
+        <Tooltip title={card.status === "active" ? "Tắt thẻ" : "Bật thẻ"}>
+          <Switch
+            checked={card.status === "active"}
+            onChange={handleToggleActive}
+            size="small"
+            sx={{
+              "& .MuiSwitch-switchBase.Mui-checked": {
+                color: "#34d399",
+              },
+              "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                backgroundColor: "#34d399",
+              },
+            }}
+          />
+        </Tooltip>
+      </TableCell>
+      <TableCell sx={{ borderBottom: `1px solid ${colors.borderLight}` }}>
         <Box sx={{ display: "flex", gap: 0.5 }}>
           {card.status !== "revoked" && (
             <Tooltip title={card.user_id ? "Gắn lại thẻ" : "Gắn thẻ"}>
@@ -538,6 +670,7 @@ export default function Cards() {
     error,
     fetchCards,
     assignUser,
+    updateCard,
     revokeCard,
     reactivateCard,
     deleteCard,
@@ -845,6 +978,7 @@ export default function Cards() {
                 card={card}
                 user={users.find((u) => u.id === card.user_id)}
                 onAssign={handleAssign}
+                onUpdate={updateCard}
                 onRevoke={handleRevoke}
                 onReactivate={handleReactivate}
                 onDelete={handleDelete}
@@ -904,6 +1038,22 @@ export default function Cards() {
                       borderBottom: `1px solid ${colors.border}`,
                     }}
                   >
+                    Enroll Mode
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      color: colors.textSecondary,
+                      borderBottom: `1px solid ${colors.border}`,
+                    }}
+                  >
+                    Active
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      color: colors.textSecondary,
+                      borderBottom: `1px solid ${colors.border}`,
+                    }}
+                  >
                     Thao tác
                   </TableCell>
                 </TableRow>
@@ -915,6 +1065,7 @@ export default function Cards() {
                     card={card}
                     users={users}
                     onAssign={handleAssign}
+                    onUpdate={updateCard}
                     onRevoke={handleRevoke}
                     onReactivate={handleReactivate}
                     onDelete={handleDelete}
