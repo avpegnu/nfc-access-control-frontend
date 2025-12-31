@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import api from '../services/api';
+import { useState, useEffect, useCallback } from "react";
+import api from "../services/api";
 
 /**
  * Hook to manage NFC cards
@@ -19,7 +19,7 @@ export function useCards() {
       }
     } catch (err) {
       setError(err.message);
-      console.error('Error fetching cards:', err);
+      console.error("Error fetching cards:", err);
     } finally {
       setLoading(false);
     }
@@ -34,12 +34,12 @@ export function useCards() {
       setError(null);
       const response = await api.assignUserToCard(cardId, userId, policy);
       if (response.success) {
-        // Update local state
-        setCards(prev => prev.map(card =>
-          card.card_id === cardId
-            ? { ...card, user_id: userId, enroll_mode: false, policy }
-            : card
-        ));
+        // Update local state with response data
+        setCards((prev) =>
+          prev.map((card) =>
+            card.card_id === cardId ? { ...card, ...response.data } : card
+          )
+        );
         return response.data;
       }
     } catch (err) {
@@ -53,9 +53,11 @@ export function useCards() {
       setError(null);
       const response = await api.updateCard(cardId, cardData);
       if (response.success) {
-        setCards(prev => prev.map(card =>
-          card.card_id === cardId ? { ...card, ...response.data } : card
-        ));
+        setCards((prev) =>
+          prev.map((card) =>
+            card.card_id === cardId ? { ...card, ...response.data } : card
+          )
+        );
         return response.data;
       }
     } catch (err) {
@@ -64,14 +66,16 @@ export function useCards() {
     }
   };
 
-  const revokeCard = async (cardId, reason = '') => {
+  const revokeCard = async (cardId, reason = "") => {
     try {
       setError(null);
       const response = await api.revokeCard(cardId, reason);
       if (response.success) {
-        setCards(prev => prev.map(card =>
-          card.card_id === cardId ? { ...card, status: 'revoked' } : card
-        ));
+        setCards((prev) =>
+          prev.map((card) =>
+            card.card_id === cardId ? { ...card, status: "revoked" } : card
+          )
+        );
         return response.data;
       }
     } catch (err) {
@@ -85,9 +89,11 @@ export function useCards() {
       setError(null);
       const response = await api.reactivateCard(cardId);
       if (response.success) {
-        setCards(prev => prev.map(card =>
-          card.card_id === cardId ? { ...card, status: 'active' } : card
-        ));
+        setCards((prev) =>
+          prev.map((card) =>
+            card.card_id === cardId ? { ...card, status: "active" } : card
+          )
+        );
         return response.data;
       }
     } catch (err) {
@@ -100,7 +106,7 @@ export function useCards() {
     try {
       setError(null);
       await api.deleteCard(cardId);
-      setCards(prev => prev.filter(card => card.card_id !== cardId));
+      setCards((prev) => prev.filter((card) => card.card_id !== cardId));
     } catch (err) {
       setError(err.message);
       throw err;
@@ -108,9 +114,11 @@ export function useCards() {
   };
 
   // Get cards by status
-  const pendingCards = cards.filter(c => c.enroll_mode && !c.user_id);
-  const activeCards = cards.filter(c => c.status === 'active' && !c.enroll_mode);
-  const revokedCards = cards.filter(c => c.status === 'revoked');
+  const pendingCards = cards.filter((c) => c.enroll_mode && !c.user_id);
+  const activeCards = cards.filter(
+    (c) => c.status === "active" && !c.enroll_mode
+  );
+  const revokedCards = cards.filter((c) => c.status === "revoked");
 
   return {
     cards,
@@ -146,7 +154,7 @@ export function useDevices() {
       }
     } catch (err) {
       setError(err.message);
-      console.error('Error fetching devices:', err);
+      console.error("Error fetching devices:", err);
     } finally {
       setLoading(false);
     }
@@ -161,11 +169,13 @@ export function useDevices() {
       setError(null);
       const response = await api.updateDeviceConfig(deviceId, config);
       if (response.success) {
-        setDevices(prev => prev.map(device =>
-          device.device_id === deviceId
-            ? { ...device, config: { ...device.config, ...response.data } }
-            : device
-        ));
+        setDevices((prev) =>
+          prev.map((device) =>
+            device.device_id === deviceId
+              ? { ...device, config: { ...device.config, ...response.data } }
+              : device
+          )
+        );
         return response.data;
       }
     } catch (err) {
@@ -175,8 +185,8 @@ export function useDevices() {
   };
 
   // Get online/offline devices
-  const onlineDevices = devices.filter(d => d.online);
-  const offlineDevices = devices.filter(d => !d.online);
+  const onlineDevices = devices.filter((d) => d.online);
+  const offlineDevices = devices.filter((d) => !d.online);
 
   return {
     devices,
