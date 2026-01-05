@@ -1,4 +1,5 @@
 import { Box, Typography, Alert } from "@mui/material";
+import { useState, useEffect } from "react";
 import DoorStatus from "../components/door/DoorStatus";
 import DoorControl from "../components/door/DoorControl";
 import AccessHistoryTable from "../components/history/AccessHistoryTable";
@@ -45,7 +46,12 @@ function StatCard({ icon, value, label, color, colors }) {
         >
           {value}
         </Typography>
-        <Typography sx={{ color: colors.textSecondary, fontSize: { xs: "0.6rem", sm: "0.7rem" } }}>
+        <Typography
+          sx={{
+            color: colors.textSecondary,
+            fontSize: { xs: "0.6rem", sm: "0.7rem" },
+          }}
+        >
           {label}
         </Typography>
       </Box>
@@ -54,15 +60,31 @@ function StatCard({ icon, value, label, color, colors }) {
 }
 
 export default function Dashboard() {
+  // Read default door ID from Settings - initialize directly from localStorage
+  const getInitialDoorId = () => {
+    try {
+      const savedConfig = localStorage.getItem("systemConfig");
+      if (savedConfig) {
+        const config = JSON.parse(savedConfig);
+        return config.defaultDoorId || "door_main";
+      }
+    } catch (e) {
+      console.error("Failed to parse config:", e);
+    }
+    return "door_main";
+  };
+
+  const [doorId] = useState(getInitialDoorId);
+
   const {
     status,
     loading: statusLoading,
     error: statusError,
     unlockDoor,
     lockDoor,
-  } = useDoorStatus();
+  } = useDoorStatus(doorId);
   const { logs, loading: logsLoading } = useAccessLogs(10);
-  const { stats, loading: statsLoading } = useAccessStats('today');
+  const { stats, loading: statsLoading } = useAccessStats("today");
   const { colors } = useThemeMode();
 
   const grantedCount = stats?.granted || 0;
@@ -148,7 +170,10 @@ export default function Dashboard() {
           <Box
             sx={{
               display: "grid",
-              gridTemplateColumns: { xs: "repeat(2, 1fr)", sm: "repeat(4, 1fr)" },
+              gridTemplateColumns: {
+                xs: "repeat(2, 1fr)",
+                sm: "repeat(4, 1fr)",
+              },
               gap: { xs: 1.5, sm: 2 },
               mb: 2,
             }}
@@ -165,21 +190,33 @@ export default function Dashboard() {
               colors={colors}
             />
             <StatCard
-              icon={<BlockIcon sx={{ color: "#f87171", fontSize: { xs: 16, sm: 20 } }} />}
+              icon={
+                <BlockIcon
+                  sx={{ color: "#f87171", fontSize: { xs: 16, sm: 20 } }}
+                />
+              }
               value={deniedCount}
               label="Từ chối"
               color="#f87171"
               colors={colors}
             />
             <StatCard
-              icon={<DevicesIcon sx={{ color: "#818cf8", fontSize: { xs: 16, sm: 20 } }} />}
+              icon={
+                <DevicesIcon
+                  sx={{ color: "#818cf8", fontSize: { xs: 16, sm: 20 } }}
+                />
+              }
               value={status?.isOnline ? "1" : "0"}
               label="Thiết bị"
               color="#818cf8"
               colors={colors}
             />
             <StatCard
-              icon={<HistoryIcon sx={{ color: "#fbbf24", fontSize: { xs: 16, sm: 20 } }} />}
+              icon={
+                <HistoryIcon
+                  sx={{ color: "#fbbf24", fontSize: { xs: 16, sm: 20 } }}
+                />
+              }
               value={totalActivity}
               label="Hoạt động"
               color="#fbbf24"
@@ -204,7 +241,11 @@ export default function Dashboard() {
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
               <HistoryIcon sx={{ color: "#818cf8", fontSize: 20 }} />
               <Typography
-                sx={{ color: colors.textPrimary, fontWeight: 600, fontSize: "0.9rem" }}
+                sx={{
+                  color: colors.textPrimary,
+                  fontWeight: 600,
+                  fontSize: "0.9rem",
+                }}
               >
                 Hoạt động gần đây
               </Typography>

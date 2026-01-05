@@ -168,7 +168,7 @@ export default function Settings() {
               </Box>
             </Box>
 
-            <TextField
+            {/* <TextField
               fullWidth
               label="Thời gian tự động khóa (ms)"
               name="autoLockDelay"
@@ -184,7 +184,7 @@ export default function Settings() {
                   </Box>
                 ),
               }}
-            />
+            /> */}
 
             <TextField
               fullWidth
@@ -228,7 +228,7 @@ export default function Settings() {
         </Grid>
 
         {/* System Info */}
-        <Grid item xs={12} md={6}>
+        {/* <Grid item xs={12} md={6}>
           <Box
             sx={{
               p: 3,
@@ -237,7 +237,6 @@ export default function Settings() {
               border: `1px solid ${colors.border}`,
             }}
           >
-            {/* Section Header */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
               <Box
                 sx={{
@@ -310,7 +309,7 @@ export default function Settings() {
               Cấu hình được lưu tạm vào localStorage. Trong môi trường production, sẽ lưu vào database.
             </Alert>
           </Box>
-        </Grid>
+        </Grid> */}
       </Grid>
     </Box>
   );

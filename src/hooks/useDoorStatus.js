@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import api from '../services/api';
+import { useState, useEffect, useCallback, useRef } from "react";
+import api from "../services/api";
 
-export function useDoorStatus(doorId = 'door_main') {
+export function useDoorStatus(doorId = "door_main") {
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -30,7 +30,7 @@ export function useDoorStatus(doorId = 'door_main') {
 
     // Subscribe to SSE for realtime updates
     const handleSSEEvent = (event) => {
-      if (event.type === 'door_status' && event.data.doorId === doorId) {
+      if (event.type === "door_status" && event.data.doorId === doorId) {
         setStatus(event.data.status);
       }
     };
@@ -43,43 +43,42 @@ export function useDoorStatus(doorId = 'door_main') {
       }
     };
 
-    // Connect SSE
-    api.connectSSE(handleSSEEvent, handleSSEError);
+    // Connect SSE and get unsubscribe function
+    const unsubscribe = api.connectSSE(handleSSEEvent, handleSSEError);
     sseConnectedRef.current = true;
 
     return () => {
-      // Don't disconnect SSE here as it's shared across hooks
+      // Unsubscribe this specific handler
+      if (unsubscribe) unsubscribe();
       sseConnectedRef.current = false;
     };
   }, [doorId, fetchStatus]);
 
   // Send command to door
-  const sendCommand = useCallback(async (action) => {
-    try {
-      setError(null);
-      setCommandLoading(true);
+  const sendCommand = useCallback(
+    async (action) => {
+      try {
+        setError(null);
+        setCommandLoading(true);
 
-      const response = await api.sendDoorCommand(doorId, action);
+        const response = await api.sendDoorCommand(doorId, action);
 
-      if (response.success) {
-        // Optimistic update while waiting for SSE
-        setStatus(prev => ({
-          ...prev,
-          isOpen: action === 'unlock'
-        }));
+        // Do NOT optimistically update - wait for ESP32 to send actual status via SSE
+        // This ensures UI reflects real door state, not just the command sent
+
+        return response.success;
+      } catch (err) {
+        setError(err.message);
+        return false;
+      } finally {
+        setCommandLoading(false);
       }
+    },
+    [doorId]
+  );
 
-      return response.success;
-    } catch (err) {
-      setError(err.message);
-      return false;
-    } finally {
-      setCommandLoading(false);
-    }
-  }, [doorId]);
-
-  const unlockDoor = useCallback(() => sendCommand('unlock'), [sendCommand]);
-  const lockDoor = useCallback(() => sendCommand('lock'), [sendCommand]);
+  const unlockDoor = useCallback(() => sendCommand("unlock"), [sendCommand]);
+  const lockDoor = useCallback(() => sendCommand("lock"), [sendCommand]);
 
   return {
     status,
@@ -88,6 +87,6 @@ export function useDoorStatus(doorId = 'door_main') {
     commandLoading,
     unlockDoor,
     lockDoor,
-    refetch: fetchStatus
+    refetch: fetchStatus,
   };
 }
