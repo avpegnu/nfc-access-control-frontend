@@ -2,26 +2,28 @@
  * API Service - Handles all communication with Backend
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:3001/api";
 
 class ApiService {
   constructor() {
     this.baseUrl = API_BASE_URL;
     this.eventSource = null;
+    this.eventHandlers = []; // Store multiple event handlers
   }
 
   // ============ Token Management ============
 
   getToken() {
-    return localStorage.getItem('authToken');
+    return localStorage.getItem("authToken");
   }
 
   setToken(token) {
-    localStorage.setItem('authToken', token);
+    localStorage.setItem("authToken", token);
   }
 
   clearToken() {
-    localStorage.removeItem('authToken');
+    localStorage.removeItem("authToken");
   }
 
   // ============ Base Request ============
@@ -32,14 +34,14 @@ class ApiService {
 
     const config = {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...(token && { Authorization: `Bearer ${token}` }),
         ...options.headers,
       },
       ...options,
     };
 
-    if (config.body && typeof config.body === 'object') {
+    if (config.body && typeof config.body === "object") {
       config.body = JSON.stringify(config.body);
     }
 
@@ -53,7 +55,7 @@ class ApiService {
           this.clearToken();
           // Don't redirect here, let the AuthContext handle it
         }
-        throw new Error(data.error?.message || 'Request failed');
+        throw new Error(data.error?.message || "Request failed");
       }
 
       return data;
@@ -66,8 +68,8 @@ class ApiService {
   // ============ Auth APIs ============
 
   async login(email, password) {
-    const response = await this.request('/auth/login', {
-      method: 'POST',
+    const response = await this.request("/auth/login", {
+      method: "POST",
       body: { email, password },
     });
 
@@ -79,15 +81,15 @@ class ApiService {
   }
 
   async register(email, password, displayName) {
-    return this.request('/auth/register', {
-      method: 'POST',
+    return this.request("/auth/register", {
+      method: "POST",
       body: { email, password, displayName },
     });
   }
 
   async logout() {
     try {
-      await this.request('/auth/logout', { method: 'POST' });
+      await this.request("/auth/logout", { method: "POST" });
     } finally {
       this.clearToken();
       this.disconnectSSE();
@@ -95,14 +97,14 @@ class ApiService {
   }
 
   async getCurrentUser() {
-    return this.request('/auth/me');
+    return this.request("/auth/me");
   }
 
   // ============ User APIs ============
 
   async getUsers(params = {}) {
     const queryString = new URLSearchParams(params).toString();
-    return this.request(`/users${queryString ? `?${queryString}` : ''}`);
+    return this.request(`/users${queryString ? `?${queryString}` : ""}`);
   }
 
   async getUserById(userId) {
@@ -110,28 +112,28 @@ class ApiService {
   }
 
   async createUser(userData) {
-    return this.request('/users', {
-      method: 'POST',
+    return this.request("/users", {
+      method: "POST",
       body: userData,
     });
   }
 
   async updateUser(userId, userData) {
     return this.request(`/users/${userId}`, {
-      method: 'PUT',
+      method: "PUT",
       body: userData,
     });
   }
 
   async deleteUser(userId) {
     return this.request(`/users/${userId}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 
   async toggleUserActive(userId) {
     return this.request(`/users/${userId}/toggle`, {
-      method: 'PATCH',
+      method: "PATCH",
     });
   }
 
@@ -139,7 +141,7 @@ class ApiService {
 
   async getCards(params = {}) {
     const queryString = new URLSearchParams(params).toString();
-    return this.request(`/v1/cards${queryString ? `?${queryString}` : ''}`);
+    return this.request(`/v1/cards${queryString ? `?${queryString}` : ""}`);
   }
 
   async getCardById(cardId) {
@@ -148,41 +150,41 @@ class ApiService {
 
   async updateCard(cardId, cardData) {
     return this.request(`/v1/cards/${cardId}`, {
-      method: 'PUT',
+      method: "PUT",
       body: cardData,
     });
   }
 
   async assignUserToCard(cardId, userId, policy = {}) {
     return this.request(`/v1/cards/${cardId}/assign`, {
-      method: 'POST',
+      method: "POST",
       body: { user_id: userId, policy },
     });
   }
 
-  async revokeCard(cardId, reason = '') {
+  async revokeCard(cardId, reason = "") {
     return this.request(`/v1/cards/${cardId}/revoke`, {
-      method: 'POST',
+      method: "POST",
       body: { reason },
     });
   }
 
   async reactivateCard(cardId) {
     return this.request(`/v1/cards/${cardId}/reactivate`, {
-      method: 'POST',
+      method: "POST",
     });
   }
 
   async deleteCard(cardId) {
     return this.request(`/v1/cards/${cardId}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 
   // ============ Device APIs (API v1) ============
 
   async getDevices() {
-    return this.request('/v1/device/list');
+    return this.request("/v1/device/list");
   }
 
   async getDeviceById(deviceId) {
@@ -191,7 +193,7 @@ class ApiService {
 
   async updateDeviceConfig(deviceId, config) {
     return this.request(`/v1/device/${deviceId}/config`, {
-      method: 'PUT',
+      method: "PUT",
       body: config,
     });
   }
@@ -199,16 +201,16 @@ class ApiService {
   // ============ Door APIs ============
 
   async getDoors() {
-    return this.request('/doors');
+    return this.request("/doors");
   }
 
-  async getDoorStatus(doorId = 'door_main') {
+  async getDoorStatus(doorId = "door_main") {
     return this.request(`/doors/${doorId}`);
   }
 
   async sendDoorCommand(doorId, action) {
     return this.request(`/doors/${doorId}/command`, {
-      method: 'POST',
+      method: "POST",
       body: { action },
     });
   }
@@ -217,10 +219,10 @@ class ApiService {
 
   async getAccessLogs(params = {}) {
     const queryString = new URLSearchParams(params).toString();
-    return this.request(`/access/logs${queryString ? `?${queryString}` : ''}`);
+    return this.request(`/access/logs${queryString ? `?${queryString}` : ""}`);
   }
 
-  async getAccessStats(period = 'today') {
+  async getAccessStats(period = "today") {
     return this.request(`/access/stats?period=${period}`);
   }
 
@@ -234,66 +236,99 @@ class ApiService {
     const token = this.getToken();
 
     if (!token) {
-      console.warn('No token for SSE connection');
+      console.warn("No token for SSE connection");
       return null;
     }
 
-    // Close existing connection
-    this.disconnectSSE();
+    // Add handler to the list
+    const handlerId = Math.random().toString(36).substring(7);
+    this.eventHandlers.push({ id: handlerId, onEvent, onError });
 
-    const url = `${this.baseUrl}/realtime/events?token=${encodeURIComponent(token)}`;
+    // Only create connection if not already connected
+    if (
+      !this.eventSource ||
+      this.eventSource.readyState === EventSource.CLOSED
+    ) {
+      this._createSSEConnection();
+    }
+
+    // Return unsubscribe function
+    return () => {
+      this.eventHandlers = this.eventHandlers.filter((h) => h.id !== handlerId);
+
+      // Disconnect only if no more handlers
+      if (this.eventHandlers.length === 0) {
+        this.disconnectSSE();
+      }
+    };
+  }
+
+  _createSSEConnection() {
+    const token = this.getToken();
+    const url = `${this.baseUrl}/realtime/events?token=${encodeURIComponent(
+      token
+    )}`;
+
     this.eventSource = new EventSource(url);
 
     // Connection opened
-    this.eventSource.addEventListener('connected', (e) => {
-      console.log('SSE connected:', JSON.parse(e.data));
+    this.eventSource.addEventListener("connected", (e) => {
+      console.log("SSE connected:", JSON.parse(e.data));
     });
 
     // Door status updates
-    this.eventSource.addEventListener('door_status', (e) => {
+    this.eventSource.addEventListener("door_status", (e) => {
       const data = JSON.parse(e.data);
-      onEvent({ type: 'door_status', data });
+      this.eventHandlers.forEach((handler) => {
+        handler.onEvent({ type: "door_status", data });
+      });
     });
 
     // Access log updates
-    this.eventSource.addEventListener('access_log', (e) => {
+    this.eventSource.addEventListener("access_log", (e) => {
       const data = JSON.parse(e.data);
-      onEvent({ type: 'access_log', data });
+      this.eventHandlers.forEach((handler) => {
+        handler.onEvent({ type: "access_log", data });
+      });
     });
 
     // User updates
-    this.eventSource.addEventListener('user_update', (e) => {
+    this.eventSource.addEventListener("user_update", (e) => {
       const data = JSON.parse(e.data);
-      onEvent({ type: 'user_update', data });
+      this.eventHandlers.forEach((handler) => {
+        handler.onEvent({ type: "user_update", data });
+      });
     });
 
     // Heartbeat
-    this.eventSource.addEventListener('heartbeat', () => {
+    this.eventSource.addEventListener("heartbeat", () => {
       // Connection is alive
     });
 
     // Error handling
     this.eventSource.onerror = (error) => {
-      console.error('SSE Error:', error);
-      if (onError) onError(error);
+      console.error("SSE Error:", error);
+      this.eventHandlers.forEach((handler) => {
+        if (handler.onError) handler.onError(error);
+      });
 
       // Auto-reconnect after 5 seconds
       if (this.eventSource?.readyState === EventSource.CLOSED) {
         setTimeout(() => {
-          console.log('SSE reconnecting...');
-          this.connectSSE(onEvent, onError);
+          console.log("SSE reconnecting...");
+          if (this.eventHandlers.length > 0) {
+            this._createSSEConnection();
+          }
         }, 5000);
       }
     };
-
-    return this.eventSource;
   }
 
   disconnectSSE() {
     if (this.eventSource) {
       this.eventSource.close();
       this.eventSource = null;
-      console.log('SSE disconnected');
+      this.eventHandlers = [];
     }
   }
 
