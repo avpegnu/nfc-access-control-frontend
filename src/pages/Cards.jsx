@@ -86,6 +86,15 @@ function MobileCardItem({
     }
   };
 
+  const handleToggleOfflineMode = async (e) => {
+    e.stopPropagation();
+    try {
+      await onUpdate(card.card_id, { offline_enabled: !card.offline_enabled });
+    } catch (err) {
+      console.error("Error toggling offline mode:", err);
+    }
+  };
+
   const getStatusConfig = () => {
     if (card.status === "revoked") {
       return {
@@ -186,7 +195,15 @@ function MobileCardItem({
       </Box>
 
       {/* Switches Row */}
-      <Box sx={{ display: "flex", gap: 2, mb: 1.5, alignItems: "center" }}>
+      <Box
+        sx={{
+          display: "flex",
+          gap: 2,
+          mb: 1.5,
+          alignItems: "center",
+          flexWrap: "wrap",
+        }}
+      >
         <FormControlLabel
           control={
             <Switch
@@ -234,6 +251,31 @@ function MobileCardItem({
               sx={{ color: colors.textSecondary, fontSize: "0.7rem" }}
             >
               Active
+            </Typography>
+          }
+        />
+        <FormControlLabel
+          control={
+            <Switch
+              checked={card.offline_enabled || false}
+              onChange={handleToggleOfflineMode}
+              size="small"
+              sx={{
+                "& .MuiSwitch-switchBase.Mui-checked": {
+                  color: "#8b5cf6",
+                },
+                "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                  backgroundColor: "#8b5cf6",
+                },
+              }}
+            />
+          }
+          label={
+            <Typography
+              variant="caption"
+              sx={{ color: colors.textSecondary, fontSize: "0.7rem" }}
+            >
+              Offline
             </Typography>
           }
         />
@@ -467,6 +509,15 @@ function CardRow({
     }
   };
 
+  const handleToggleOfflineMode = async (e) => {
+    e.stopPropagation();
+    try {
+      await onUpdate(card.card_id, { offline_enabled: !card.offline_enabled });
+    } catch (err) {
+      console.error("Error toggling offline mode:", err);
+    }
+  };
+
   const getStatusChip = () => {
     if (card.status === "revoked") {
       return (
@@ -593,6 +644,27 @@ function CardRow({
               },
               "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
                 backgroundColor: "#34d399",
+              },
+            }}
+          />
+        </Tooltip>
+      </TableCell>
+      <TableCell sx={{ borderBottom: `1px solid ${colors.borderLight}` }}>
+        <Tooltip
+          title={
+            card.offline_enabled ? "Tắt chế độ offline" : "Bật chế độ offline"
+          }
+        >
+          <Switch
+            checked={card.offline_enabled || false}
+            onChange={handleToggleOfflineMode}
+            size="small"
+            sx={{
+              "& .MuiSwitch-switchBase.Mui-checked": {
+                color: "#8b5cf6",
+              },
+              "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                backgroundColor: "#8b5cf6",
               },
             }}
           />
@@ -1047,6 +1119,14 @@ export default function Cards() {
                     }}
                   >
                     Active
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      color: colors.textSecondary,
+                      borderBottom: `1px solid ${colors.border}`,
+                    }}
+                  >
+                    Offline Mode
                   </TableCell>
                   <TableCell
                     sx={{
