@@ -3,7 +3,7 @@
  */
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:3001/api";
+  import.meta.env.VITE_API_URL || "http://localhost:3001/api/v1";
 
 class ApiService {
   constructor() {
@@ -141,42 +141,42 @@ class ApiService {
 
   async getCards(params = {}) {
     const queryString = new URLSearchParams(params).toString();
-    return this.request(`/v1/cards${queryString ? `?${queryString}` : ""}`);
+    return this.request(`/cards${queryString ? `?${queryString}` : ""}`);
   }
 
   async getCardById(cardId) {
-    return this.request(`/v1/cards/${cardId}`);
+    return this.request(`/cards/${cardId}`);
   }
 
   async updateCard(cardId, cardData) {
-    return this.request(`/v1/cards/${cardId}`, {
+    return this.request(`/cards/${cardId}`, {
       method: "PUT",
       body: cardData,
     });
   }
 
   async assignUserToCard(cardId, userId, policy = {}) {
-    return this.request(`/v1/cards/${cardId}/assign`, {
+    return this.request(`/cards/${cardId}/assign`, {
       method: "POST",
       body: { user_id: userId, policy },
     });
   }
 
   async revokeCard(cardId, reason = "") {
-    return this.request(`/v1/cards/${cardId}/revoke`, {
+    return this.request(`/cards/${cardId}/revoke`, {
       method: "POST",
       body: { reason },
     });
   }
 
   async reactivateCard(cardId) {
-    return this.request(`/v1/cards/${cardId}/reactivate`, {
+    return this.request(`/cards/${cardId}/reactivate`, {
       method: "POST",
     });
   }
 
   async deleteCard(cardId) {
-    return this.request(`/v1/cards/${cardId}`, {
+    return this.request(`/cards/${cardId}`, {
       method: "DELETE",
     });
   }
@@ -184,15 +184,15 @@ class ApiService {
   // ============ Device APIs (API v1) ============
 
   async getDevices() {
-    return this.request("/v1/device/list");
+    return this.request("/device/list");
   }
 
   async getDeviceById(deviceId) {
-    return this.request(`/v1/device/${deviceId}`);
+    return this.request(`/device/${deviceId}`);
   }
 
   async updateDeviceConfig(deviceId, config) {
-    return this.request(`/v1/device/${deviceId}/config`, {
+    return this.request(`/device/${deviceId}/config`, {
       method: "PUT",
       body: config,
     });
